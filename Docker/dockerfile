@@ -1,0 +1,8 @@
+# syntax=docker/dockerfile:1
+
+FROM asuracodes/work:cm4
+
+RUN sudo apt update
+RUN sudo apt install -y cmake
+RUN sudo apt install -y gcc-arm-linux-gnueabihf
+RUN sudo apt install -y g++-arm-linux-gnueabihf
