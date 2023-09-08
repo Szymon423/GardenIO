@@ -6,3 +6,11 @@ RUN sudo apt update
 RUN sudo apt install -y cmake
 RUN sudo apt install -y gcc-arm-linux-gnueabihf
 RUN sudo apt install -y g++-arm-linux-gnueabihf
+RUN sudo apt install -y sqlite3 libsqlite3-dev
+# RUN sudo apt install -y git
+# RUN git clone https://github.com/eclipse/paho.mqtt.c.git
+# RUN cd paho.mqtt.c
+# RUN git checkout v1.3.8
+# RUN cmake -Bbuild -H. -DPAHO_ENABLE_TESTING=OFF -DPAHO_BUILD_STATIC=ON -DPAHO_WITH_SSL=ON -DPAHO_HIGH_PERFORMANCE=ON
+# RUN sudo cmake --build build/ --target install
+# RUN sudo ldconfig

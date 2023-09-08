@@ -1,7 +1,11 @@
+#include "sqlite_wrapper.hpp"
 #include <iostream>
 
 
 int main()
 {
-    std::cout << "HelloWorld" << std::endl;
+    char *db_path = "/home/szymon/GardenIO/database/test.db";
+    sqlite_wrapper test(db_path);
+    int ret;
+    ret = test.create_table();
 }
