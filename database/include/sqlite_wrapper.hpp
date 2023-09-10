@@ -1,5 +1,7 @@
+#pragma once
+
 #include "sqlite3.h"
-#include <iostream>
+#include "signals_definitions.hpp"
 
 // https://www.tutorialspoint.com/sqlite/sqlite_c_cpp.htm
 class sqlite_wrapper
@@ -14,7 +16,9 @@ public:
     ~sqlite_wrapper();
     int connect();
     int disconnect();
-    int create_table();
+    int create_tables();
+    int insert(analog_signal_t signal);
+    int insert(binary_signal_t signal);
     static int callback(void *NotUsed, int argc, char **argv, char **azColName);
     
 };

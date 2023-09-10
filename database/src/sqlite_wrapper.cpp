@@ -1,11 +1,9 @@
 #include "sqlite_wrapper.hpp"
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
 
-sqlite_wrapper::sqlite_wrapper(const char *db_path) : db_path(db_path)
-{
-    // this->db_path = db_path;
-}
+sqlite_wrapper::sqlite_wrapper(const char *db_path) : db_path(db_path) {}
 
 sqlite_wrapper::~sqlite_wrapper()
 {
@@ -34,21 +32,22 @@ int sqlite_wrapper::disconnect()
     return 0;
 }
 
-int sqlite_wrapper::create_table()
+int sqlite_wrapper::create_tables()
 {
-   int ret = this->connect();
-   if (ret != 0) return -1;
+    int ret = this->connect();
+    if (ret != 0) return -1;
 
-   char *sql;
-    /* Create SQL statement */
-   sql = "CREATE TABLE COMPANY("  \
-         "ID INT PRIMARY KEY     NOT NULL," \
-         "NAME           TEXT    NOT NULL," \
-         "AGE            INT     NOT NULL," \
-         "ADDRESS        CHAR(50)," \
-         "SALARY         REAL );";
+    // create ANALOGS table
+    char const *sql;
+    sql = "CREATE TABLE ANALOGS("  \
+          "ID        INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
+          "time      INT         NOT NULL," \
+          "value     REAL        NOT NULL," \
+          "unit      CHAR(10)," \
+          "valid     INT         NOT NULL," \
+          "source    CHAR(100)," \
+          "type      INT         NOT NULL);";
 
-    /* Execute SQL statement */
     rc = sqlite3_exec(db, sql, sqlite_wrapper::callback, 0, &zErrMsg);
 
     if (rc != SQLITE_OK)
@@ -60,7 +59,30 @@ int sqlite_wrapper::create_table()
     }
     else
     {
-        std::cout << "Table created successfully" << std::endl;
+        std::cout << "Table ANALOGS created successfully" << std::endl;
+    }
+
+    // create BINARIES table
+    sql = "CREATE TABLE BINARIES("  \
+          "ID        INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," \
+          "time      INT         NOT NULL," \
+          "value     INT         NOT NULL," \
+          "valid     INT         NOT NULL," \
+          "source    CHAR(100)," \
+          "type      INT         NOT NULL);";
+
+    rc = sqlite3_exec(db, sql, sqlite_wrapper::callback, 0, &zErrMsg);
+
+    if (rc != SQLITE_OK)
+    {
+        std::cout << "SQL error: " << zErrMsg << std::endl;
+        sqlite3_free(zErrMsg);
+        this->disconnect();
+        return -1;
+    }
+    else
+    {
+        std::cout << "Table BINARIES created successfully" << std::endl;
     }
 
     ret = this->disconnect();
@@ -68,6 +90,47 @@ int sqlite_wrapper::create_table()
 
     return 0;
 }
+
+int sqlite_wrapper::insert(analog_signal_t signal)
+{
+    int ret = this->connect();
+    if (ret != 0) return -1;
+
+    // create include statement
+    std::string sql_s "INSERT INTO ANALOGS (NAME,AGE,ADDRESS,SALARY)\n";
+    sql_s += "VALUES (" + std::to_string(signal.time) + ", ";
+    sql_s += std::to_string(signal.value) + ",";
+    sql_s += "\'"std::to_string(signal.unit) + "',";
+    sql_s += std::to_string(signal.valid) + ",";
+    sql_s += "\'"std::to_string(signal.source) + "',";
+    sql_s += std::to_string(signal.type) + ");";
+
+    char const *sql = const_cast<char*>(sql_s.c_str());
+
+
+    rc = sqlite3_exec(db, sql, sqlite_wrapper::callback, 0, &zErrMsg);
+
+    if (rc != SQLITE_OK)
+    {
+        std::cout << "SQL error: " << zErrMsg << std::endl;
+        sqlite3_free(zErrMsg);
+        this->disconnect();
+        return -1;
+    }
+    else
+    {
+        std::cout << "Inserted into ANALOGS successfully" << std::endl;
+    }
+
+    
+
+    ret = this->disconnect();
+    if (ret != 0) return -1;
+
+    return 0;
+}
+
+
 
 int sqlite_wrapper::callback(void *NotUsed, int argc, char **argv, char **azColName) 
 {

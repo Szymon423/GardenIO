@@ -11,5 +11,5 @@ add_subdirectory(database)
 add_executable(GardenIO main.cpp)
 
 target_link_libraries(GardenIO LINK_PUBLIC sqlite3)
-target_link_libraries(GardenIO PRIVATE sqlite_wrapper)
-target_link_libraries(GardenIO PRIVATE signals_definitions)
+target_link_libraries(GardenIO PUBLIC sqlite_wrapper)
+target_link_libraries(GardenIO PUBLIC shared_memory)
