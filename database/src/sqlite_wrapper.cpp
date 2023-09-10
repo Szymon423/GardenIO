@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-sqlite_wrapper::sqlite_wrapper(char *db_path)
+sqlite_wrapper::sqlite_wrapper(const char *db_path) : db_path(db_path)
 {
-    this->db_path = db_path;
+    // this->db_path = db_path;
 }
 
 sqlite_wrapper::~sqlite_wrapper()

@@ -8,9 +8,9 @@ private:
     sqlite3 *db;
     char *zErrMsg = 0;
     int rc;
-    char * db_path;
+    const char * db_path;
 public:
-    sqlite_wrapper(char *db_path);
+    sqlite_wrapper(const char *db_path);
     ~sqlite_wrapper();
     int connect();
     int disconnect();
