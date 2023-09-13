@@ -97,12 +97,12 @@ int sqlite_wrapper::insert(analog_signal_t signal)
     if (ret != 0) return -1;
 
     // create include statement
-    std::string sql_s "INSERT INTO ANALOGS (NAME,AGE,ADDRESS,SALARY)\n";
+    std::string sql_s = "INSERT INTO ANALOGS (time,value,unit,valid,source,type) ";
     sql_s += "VALUES (" + std::to_string(signal.time) + ", ";
     sql_s += std::to_string(signal.value) + ",";
-    sql_s += "\'"std::to_string(signal.unit) + "',";
+    sql_s += "\'" + std::string(signal.unit) + "',";
     sql_s += std::to_string(signal.valid) + ",";
-    sql_s += "\'"std::to_string(signal.source) + "',";
+    sql_s += "\'" + std::string(signal.source) + "',";
     sql_s += std::to_string(signal.type) + ");";
 
     char const *sql = const_cast<char*>(sql_s.c_str());

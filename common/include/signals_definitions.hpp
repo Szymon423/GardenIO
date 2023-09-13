@@ -1,6 +1,7 @@
 #pragma once
 
 #include <time.h>
+#include <cstdint>
 
 #define MAX_SOURCE_NAME_LENGTH 100
 #define MAX_UNIT_LENGTH 10
