@@ -17,8 +17,8 @@ public:
     int connect();
     int disconnect();
     int create_tables();
-    int insert(analog_signal_t signal);
-    int insert(binary_signal_t signal);
+    int insert(signals::analog_signal_t signal);
+    int insert(signals::binary_signal_t signal);
     static int callback(void *NotUsed, int argc, char **argv, char **azColName);
     
 };
