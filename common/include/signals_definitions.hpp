@@ -38,7 +38,7 @@ namespace signals
             std::string ret;
             ret += "value: " + val + " " + std::string(unit);
             ret += ", from: " + std::string(source);
-            ret += ", " + utility::time_to_human(time);
+            ret += ", [" + utility::time_to_human(time) + "]";
             ret += ", type: " + type_to_string(type);
             ret += ", archive: " + std::to_string(archive);
             return ret;

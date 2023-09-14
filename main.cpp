@@ -16,7 +16,7 @@ int main()
     my_struct.type = signals::signal_type::info;
 
     logger::manager LOG;
-    LOG.Initialize();
+    LOG.Initialize("/home/szymon/GardenIO/GardenIO.log");
 
     LOG_TRACE(std::string(my_struct));
     // std::cout << std::string(my_struct) << std::endl;

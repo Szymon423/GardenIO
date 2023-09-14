@@ -13,7 +13,7 @@ namespace logger
         manager() = default;
         ~manager() = default;
 
-        void Initialize();
+        void Initialize(std::string log_file_path);
         void Shutdown();        
     };
 }
