@@ -1,3 +1,3 @@
 build
-third-party/pachomqtt/include/pacho.mqtt.c
-third-party/spdlog/include/spdlog
+third-party\spdlog\include
+third-party\pachomqtt\include
