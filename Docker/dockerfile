@@ -1,5 +1,4 @@
 FROM asuracodes/work:cm4
-# FORM armhf/debian
 
 # make it up to date
 RUN apt update && apt install -y

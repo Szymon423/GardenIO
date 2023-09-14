@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
+#include "log.hpp"
 
 sqlite_wrapper::sqlite_wrapper(const char *db_path) : db_path(db_path) {}
 
@@ -16,12 +17,14 @@ int sqlite_wrapper::connect()
 
     if (rc)
     {
-        std::cout << "Can't open database: " << sqlite3_errmsg(db) << std::endl;
+        LOG_ERROR("Can't open database: {}", sqlite3_errmsg(db));
+        // std::cout << "Can't open database: " << sqlite3_errmsg(db) << std::endl;
         return -1;
     } 
     else
     {
-        std::cout << "Opened database successfully" << std::endl;
+        LOG_TRACE("Opened database successfully");
+        // std::cout << "Opened database successfully" << std::endl;
     }
     return 0;
 }
@@ -52,14 +55,16 @@ int sqlite_wrapper::create_tables()
 
     if (rc != SQLITE_OK)
     {
-        std::cout << "SQL error: " << zErrMsg << std::endl;
+        LOG_ERROR("SQL error: {}", zErrMsg);
+        // std::cout << "SQL error: " << zErrMsg << std::endl;
         sqlite3_free(zErrMsg);
         this->disconnect();
         return -1;
     }
     else
     {
-        std::cout << "Table ANALOGS created successfully" << std::endl;
+        LOG_TRACE("Table ANALOGS created successfully");
+        // std::cout << "Table ANALOGS created successfully" << std::endl;
     }
 
     // create BINARIES table
@@ -75,14 +80,16 @@ int sqlite_wrapper::create_tables()
 
     if (rc != SQLITE_OK)
     {
-        std::cout << "SQL error: " << zErrMsg << std::endl;
+        LOG_ERROR("SQL error: {}", zErrMsg);
+        // std::cout << "SQL error: " << zErrMsg << std::endl;
         sqlite3_free(zErrMsg);
         this->disconnect();
         return -1;
     }
     else
     {
-        std::cout << "Table BINARIES created successfully" << std::endl;
+        LOG_TRACE("Table BINARIES created successfully");
+        // std::cout << "Table BINARIES created successfully" << std::endl;
     }
 
     ret = this->disconnect();
@@ -112,14 +119,16 @@ int sqlite_wrapper::insert(signals::analog_signal_t signal)
 
     if (rc != SQLITE_OK)
     {
-        std::cout << "SQL error: " << zErrMsg << std::endl;
+        LOG_ERROR("SQL error: {}", zErrMsg);
+        // std::cout << "SQL error: " << zErrMsg << std::endl;
         sqlite3_free(zErrMsg);
         this->disconnect();
         return -1;
     }
     else
     {
-        std::cout << "Inserted into ANALOGS successfully" << std::endl;
+        LOG_TRACE("Inserted into ANALOGS successfully");
+        // std::cout << "Inserted into ANALOGS successfully" << std::endl;
     }
 
     
@@ -150,14 +159,16 @@ int sqlite_wrapper::insert(signals::binary_signal_t signal)
 
     if (rc != SQLITE_OK)
     {
-        std::cout << "SQL error: " << zErrMsg << std::endl;
+        LOG_ERROR("SQL error: {}", zErrMsg);
+        // std::cout << "SQL error: " << zErrMsg << std::endl;
         sqlite3_free(zErrMsg);
         this->disconnect();
         return -1;
     }
     else
     {
-        std::cout << "Inserted into BINARIES successfully" << std::endl;
+        LOG_TRACE("Table BINARIES created successfully");
+        // std::cout << "Inserted into BINARIES successfully" << std::endl;
     }  
 
     ret = this->disconnect();
