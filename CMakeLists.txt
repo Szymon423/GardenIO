@@ -17,5 +17,6 @@ target_link_libraries(GardenIO LINK_PUBLIC sqlite3)
 target_link_libraries(GardenIO PUBLIC sqlite_wrapper)
 target_link_libraries(GardenIO PUBLIC common)
 target_link_libraries(GardenIO PUBLIC spdlog)
+target_link_libraries(GardenIO PUBLIC pachomqtt)
 
 # target_link_libraries(GardenIO PUBLIC ${LIBS_TO_LINK})
