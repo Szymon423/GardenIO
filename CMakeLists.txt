@@ -8,15 +8,17 @@ set(CMAKE_CPP_COMPILER g++-arm-linux-gnueabihf)
 
 add_subdirectory(common)
 add_subdirectory(database)
+add_subdirectory(mqtt)
 add_subdirectory(third-party/spdlog)
 
 add_executable(GardenIO main.cpp)
 
 # target_link_libraries(GardenIO ${CMAKE_SYSROOT}/usr/lib/x86_64-linux-gnu/libsqlite3.a)
 target_link_libraries(GardenIO LINK_PUBLIC sqlite3)
+target_link_libraries(GardenIO LINK_PUBLIC mosquitto)
 target_link_libraries(GardenIO PUBLIC sqlite_wrapper)
 target_link_libraries(GardenIO PUBLIC common)
+target_link_libraries(GardenIO PUBLIC mqtt)
 target_link_libraries(GardenIO PUBLIC spdlog)
-target_link_libraries(GardenIO PUBLIC pachomqtt)
 
 # target_link_libraries(GardenIO PUBLIC ${LIBS_TO_LINK})

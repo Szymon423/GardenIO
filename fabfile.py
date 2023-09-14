@@ -23,6 +23,11 @@ def Install(ctx):
 @task
 def InstallSQLite(ctx):
     with Connection(host=ctx.host, user=user, port=port, connect_kwargs={'password': password}) as c:
-        c.sudo("sudo apt update")
-        c.sudo("sudo apt install -y sqlite3")
-        
+        c.sudo("apt update")
+        c.sudo("apt install -y sqlite3")
+
+@task
+def InstallMosquitto(ctx):
+    with Connection(host=ctx.host, user=user, port=port, connect_kwargs={'password': password}) as c:
+        c.sudo("apt update")
+        c.sudo("apt install -y mosquitto mosquitto-clients")
