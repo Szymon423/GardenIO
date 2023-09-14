@@ -1,11 +1,26 @@
 #pragma once
 
 #include <mosquitto.h>
+#include <string>
 
-void on_connect(struct mosquitto *mosq, void *obj, int reason_code);
+class MQTT
+{
+public:
 
-void on_publish(struct mosquitto *mosq, void *obj, int mid);
+    struct mosquitto *mosq;
+    int rc;
+    int valid;
 
-int get_temperature(void);
 
-void publish_sensor_data(struct mosquitto *mosq);
+
+    MQTT();
+    ~MQTT();
+    void initialize();
+    void connect(std::string broker_ip, int port, int keepalive);
+    void run();
+    void shutdown();
+    static void on_connect(struct mosquitto *mosq, void *obj, int reason_code);
+    static void on_publish(struct mosquitto *mosq, void *obj, int mid);
+    void publish_sensor_data();
+    int get_temperature(void);
+};

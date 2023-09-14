@@ -1,8 +1,88 @@
 #include "mqtt_client.hpp"
 #include "log.hpp"
+#include <string>
+
+
+
+MQTT::MQTT() 
+{
+    mosq = nullptr;
+    valid = 1;
+}
+
+MQTT::~MQTT() {}
+
+
+void MQTT::initialize()
+{
+    // check if ok to proceed
+    if (valid != 1) return;
+
+    /* Required before calling other mosquitto functions */
+    mosquitto_lib_init();
+
+    /* Create a new client instance.
+	 * id = NULL -> ask the broker to generate a client id for us
+	 * clean session = true -> the broker should remove old sessions when we connect
+	 * obj = NULL -> we aren't passing any of our private data for callbacks
+	 */
+	mosq = mosquitto_new(NULL, true, NULL);
+	if(mosq == NULL)
+    {
+        LOG_ERROR("Error: Out of memory.");
+        valid = 0;
+		return;
+	}
+
+    /* Configure callbacks. This should be done before connecting ideally. */
+    mosquitto_connect_callback_set(mosq, MQTT::on_connect);
+	mosquitto_publish_callback_set(mosq, MQTT::on_publish);
+}
+
+void MQTT::connect(std::string broker_ip, int port, int keepalive)
+{
+    // check if ok to proceed
+    if (valid != 1) return;
+
+    /* Connect to test.mosquitto.org on port 1883, with a keepalive of 60 seconds.
+	 * This call makes the socket connection only, it does not complete the MQTT
+	 * CONNECT/CONNACK flow, you should use mosquitto_loop_start() or
+	 * mosquitto_loop_forever() for processing net traffic. */
+    rc = mosquitto_connect(mosq, const_cast<char*>(broker_ip.c_str()), port, keepalive);
+	if(rc != MOSQ_ERR_SUCCESS)
+    {
+		valid = 0;
+        mosquitto_destroy(mosq);
+        LOG_ERROR("Error: {}", mosquitto_strerror(rc));
+		return;
+	}
+}
+
+void MQTT::run()
+{
+    // check if ok to proceed
+    if (valid != 1) return;
+    
+    /* Run the network loop in a background thread, this call returns quickly. */
+    rc = mosquitto_loop_start(mosq);
+	if(rc != MOSQ_ERR_SUCCESS)
+    {
+		valid = 0;
+        mosquitto_destroy(mosq);
+		LOG_ERROR("Error: {}", mosquitto_strerror(rc));
+		return;
+	}
+}
+
+void MQTT::shutdown()
+{
+    mosquitto_lib_cleanup();
+}
+
+
 
 /* Callback called when the client receives a CONNACK message from the broker. */
-void on_connect(struct mosquitto *mosq, void *obj, int reason_code)
+void MQTT::on_connect(struct mosquitto *mosq, void *obj, int reason_code)
 {
 	/* Print out the connection result. mosquitto_connack_string() produces an
 	 * appropriate string for MQTT v3.x clients, the equivalent for MQTT v5.0
@@ -26,20 +106,20 @@ void on_connect(struct mosquitto *mosq, void *obj, int reason_code)
  * been completely written to the operating system. For QoS 1 this means we
  * have received a PUBACK from the broker. For QoS 2 this means we have
  * received a PUBCOMP from the broker. */
-void on_publish(struct mosquitto *mosq, void *obj, int mid)
+void MQTT::on_publish(struct mosquitto *mosq, void *obj, int mid)
 {
 	LOG_TRACE("Message with mid {} has been published.", mid);
 }
 
 
-int get_temperature(void)
+int MQTT::get_temperature(void)
 {
 	sleep(1); /* Prevent a storm of messages - this pretend sensor works at 1Hz */
 	return random()%100;
 }
 
 /* This function pretends to read some data from a sensor and publish it.*/
-void publish_sensor_data(struct mosquitto *mosq)
+void MQTT::publish_sensor_data()
 {
 	char payload[20];
 	int temp;
