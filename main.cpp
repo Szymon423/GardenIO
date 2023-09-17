@@ -1,12 +1,14 @@
-#include "sqlite_wrapper.hpp"
-#include "signals_definitions.hpp"
 #include <iostream>
 #include <string>
 #include <cstring>
+#include <thread>
+#include <chrono>
+
+#include "sqlite_wrapper.hpp"
+#include "signals_definitions.hpp"
 #include "log_manager.hpp"
 #include "log.hpp"
 #include "mqtt_client.hpp"
-// #include <mosquitto.h>
 
 int main()
 {
@@ -15,8 +17,9 @@ int main()
 
     MQTT mqtt;
     mqtt.initialize();
-    mqtt.connect("localhost", 1883, 60);
+    mqtt.connect("localhost", 1883, 60, reconnect::RECONNECT);
     mqtt.run();
+    mqtt.subscribe("test_topic");
 
 
 	/* At this point the client is connected to the network socket, but may not
@@ -26,10 +29,13 @@ int main()
 	 * the connect callback.
 	 * In this case we know it is 1 second before we start publishing.
 	 */
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < 10; i++)
     {
-		mqtt.publish_sensor_data();
+		mqtt.publish("test_topic", "dupa");
 	}
+
+    // sleep for 5s
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 
     mqtt.shutdown();
     
