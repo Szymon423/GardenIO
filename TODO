@@ -1,6 +1,8 @@
+- [x] Implement protocol for my wind sensor - direction and speed readings
+- [x] Put MQTT into Protocols Directory
+- [ ] Make wind readings as analog signals and parse them to DB
+- [ ] Run wind ReadLoop on thread
 - [ ] Implement analog/binary signals parser for mqtt payload
-- [ ] Put MQTT into Protocols Directory
 - [ ] Add libmodbus to the project as another communication protocol
-- [ ] Implement protocol for my wind sensor - direction and speed readings
 - [ ] Implement archivisor class so it can do backups every <X> hours/days/...
 - [ ] Implement raporting mechanism - not sure if it's okay to put it here or maybe better place is web interface
