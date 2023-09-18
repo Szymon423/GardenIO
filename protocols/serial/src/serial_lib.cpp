@@ -1,18 +1,26 @@
 #include "serial_lib.hpp"
 #include "log.hpp"
 
+#include <sys/ioctl.h>
 
-Serial::Serial(std::string device_name, int baud_rate, data_bits dbits, parity par, stop_bits sb)
-: tty(), rc(0), device_name(device_name), baud_rate(baud_rate), par(par), sbits(sbits), dbits(dbits)
+
+/*
+https://blog.mbedded.ninja/programming/operating-systems/linux/linux-serial-ports-using-c-cpp/
+*/
+Serial::Serial(std::string device_name, BaudRate brate, DataBits dbits, Parity par, StopBits sbits)
+: tty(), rc(0), device_name(device_name), brate(brate), par(par), sbits(sbits), dbits(dbits)
 {
-    
+
 }
 
-Serial::~Serial() {}
-
-void Serial::open()
+Serial::~Serial() 
 {
-    int serial_port = open(device_name, type);
+    Close();
+}
+
+void Serial::Open()
+{
+    serial_port = open(device_name.c_str(), O_RDWR);
 
     // Check for errors
     if (serial_port < 0) 
@@ -32,18 +40,18 @@ void Serial::open()
 
     switch (par)
     {
-        case parity::none:
+        case Parity::NONE:
         {
             tty.c_cflag &= ~PARENB;
             break;
         }
-        case parity::even:
+        case Parity::EVEN:
         {
             tty.c_cflag |= PARENB;
             tty.c_cflag &= ~PARODD;
             break;
         }
-        case parity::odd:
+        case Parity::ODD:
         {
             tty.c_cflag |= PARENB;
             tty.c_cflag |= PARODD;
@@ -51,7 +59,7 @@ void Serial::open()
         }
         default:
         {
-            LOG_ERROR("Unknown parity declaration for: {}", device_name);
+            LOG_ERROR("Unknown Parity declaration for: {}", device_name);
             rc = -1;
             return;
         }
@@ -59,14 +67,14 @@ void Serial::open()
 
     switch (sbits)
     {
-        case stop_bits::one:
-        {
-            tty.c_cflag |= CSTOPB;
-            break;
-        }
-        case stop_bits::two:
+        case StopBits::ONE:
         {
             tty.c_cflag &= ~CSTOPB;
+            break;
+        }
+        case StopBits::TWO:
+        {
+            tty.c_cflag |= CSTOPB;
             break;
         }
         default:
@@ -77,25 +85,26 @@ void Serial::open()
         }
     }
 
-    tty.c_cflag &= ~(CS5 | CS6 | CS7 | CS8);
+    // Clear all bits that set the data size 
+    tty.c_cflag &= ~CSIZE;
     switch (dbits)
     {
-        case data_bits::CS5:
+        case DataBits::FIVE:
         {
             tty.c_cflag |= CS5;
             break;
         }
-        case data_bits::CS6:
+        case DataBits::SIX:
         {
-            tty.c_cflag |= CS5;
+            tty.c_cflag |= CS6;
             break;
         }
-        case data_bits::CS7:
+        case DataBits::SEVEN:
         {
             tty.c_cflag |= CS7;
             break;
         }
-        case data_bits::CS8:
+        case DataBits::EIGHT:
         {
             tty.c_cflag |= CS8;
             break;
@@ -107,7 +116,91 @@ void Serial::open()
             return;
         }
     }
+        
+    tty.c_cflag |= CREAD | CLOCAL;              // Turn on READ & ignore ctrl lines (CLOCAL = 1)
+    tty.c_lflag &= ~ICANON;                     // noncanonical mode
+    tty.c_lflag &= ~ECHO;                       // Disable echo
+    tty.c_lflag &= ~ECHOE;                      // Disable erasure
+    tty.c_lflag &= ~ECHONL;                     // Disable new-line echo
+    tty.c_lflag &= ~ISIG;                       // Disable interpretation of INTR, QUIT and SUSP
+    tty.c_iflag &= ~(IXON | IXOFF | IXANY);     // Turn off s/w flow ctrl
+    tty.c_iflag &= ~(IGNBRK|BRKINT|PARMRK|ISTRIP|INLCR|IGNCR|ICRNL); // Disable any special handling of received bytes
 
+    tty.c_oflag &= ~OPOST;                      // Prevent special interpretation of output bytes (e.g. newline chars)
+    tty.c_oflag &= ~ONLCR;                      // Prevent conversion of newline to carriage return/line feed
+    // tty.c_oflag &= ~OXTABS; // Prevent conversion of tabs to spaces (NOT PRESENT ON LINUX)
+    // tty.c_oflag &= ~ONOEOT; // Prevent removal of C-d chars (0x004) in output (NOT PRESENT ON LINUX)
 
+    tty.c_cc[VTIME] = 10;    // Wait for up to 1s (10 deciseconds), returning as soon as any data is received.
+    tty.c_cc[VMIN] = 0;
 
+    // Set in/out baud rate to be 9600
+    cfsetispeed(&tty, brate);
+    cfsetospeed(&tty, brate);
+
+    // Save tty settings, also checking for error
+    if (tcsetattr(serial_port, TCSANOW, &tty) != 0) 
+    {
+        LOG_ERROR("Error {} from tcsetattr: {}", errno, strerror(errno));
+        rc = -1;
+        return;
+    }
+
+    // initialise read_buffor with '\0'
+    memset(&read_buffer, '\0', sizeof(read_buffer));
 }
+
+void Serial::Close()
+{
+    close(serial_port);
+}
+
+void Serial::Write(std::string data)
+{
+    int writeResult = write(serial_port, data.c_str(), sizeof(data.c_str()));
+
+    // Check status
+    if (writeResult == -1)
+    {
+        rc = -1;
+        LOG_ERROR("Can not write to Serial: {}", device_name);
+    }
+}
+
+std::string Serial::Read()
+{
+    // Read from file
+    // We provide the underlying raw array from the readBuffer_ vector to this C api.
+    // This will work because we do not delete/resize the vector while this method
+    // is called
+    std::string data;
+    size_t n = read(serial_port, &read_buffer[0], SERIAL_READ_BUFFOR_SIZE);
+
+    if (n < 0) 
+    {
+        LOG_ERROR("Can not read from Serial: {}", device_name);
+    }
+    else if(n == 0) 
+    {
+        data = "";
+    }
+    else if(n > 0) 
+    {
+        data = std::string(&read_buffer[0], n);
+    }
+    return data;
+}
+
+void Serial::SetTimeout(int timeout)
+{
+    tty.c_cc[VTIME] = (cc_t)(timeout / 100);
+    tty.c_cc[VMIN] = 0;
+}
+
+int32_t Serial::IsAvaliable()
+{   
+    int32_t ret = 0;
+    ioctl(serial_port, FIONREAD, &ret);
+    return ret;
+}
+

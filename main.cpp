@@ -9,35 +9,54 @@
 #include "log_manager.hpp"
 #include "log.hpp"
 #include "mqtt_client.hpp"
+#include "wind_sensor.hpp"
 
 int main()
 {
     logger::manager LOG;
     LOG.Initialize("/home/szymon/GardenIO/GardenIO.log");
 
-    MQTT mqtt;
-    mqtt.initialize();
-    mqtt.connect("localhost", 1883, 60, reconnect::RECONNECT);
-    mqtt.run();
-    mqtt.subscribe("test_topic");
+    
+    WindSensor ws("/dev/ttyUSB0");
+    ws.ReadLoop(10);
 
 
-	/* At this point the client is connected to the network socket, but may not
-	 * have completed CONNECT/CONNACK.
-	 * It is fairly safe to start queuing messages at this point, but if you
-	 * want to be really sure you should wait until after a successful call to
-	 * the connect callback.
-	 * In this case we know it is 1 second before we start publishing.
-	 */
-	for (int i = 0; i < 10; i++)
-    {
-		mqtt.publish("test_topic", "dupa");
-	}
 
-    // sleep for 5s
-    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 
-    mqtt.shutdown();
+
+
+
+
+
+
+
+
+
+
+
+    // MQTT mqtt;
+    // mqtt.initialize();
+    // mqtt.connect("localhost", 1883, 60, reconnect::RECONNECT);
+    // mqtt.run();
+    // mqtt.subscribe("test_topic");
+
+
+	// /* At this point the client is connected to the network socket, but may not
+	//  * have completed CONNECT/CONNACK.
+	//  * It is fairly safe to start queuing messages at this point, but if you
+	//  * want to be really sure you should wait until after a successful call to
+	//  * the connect callback.
+	//  * In this case we know it is 1 second before we start publishing.
+	//  */
+	// for (int i = 0; i < 10; i++)
+    // {
+	// 	mqtt.publish("test_topic", "dupa");
+	// }
+
+    // // sleep for 5s
+    // std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+
+    // mqtt.shutdown();
     
     // signals::analog_signal_t my_struct;
     // my_struct.time = 123456;

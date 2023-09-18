@@ -7,46 +7,60 @@
 #include <termios.h> // Contains POSIX terminal control definitions
 #include <unistd.h> // write(), read(), close()
 
-enum acces
-{
-    O_RDONLY = O_RDONLY,
-    O_WRONLY = O_WRONLY,
-    O_RDWR = O_RDWR
-}
+#define SERIAL_READ_BUFFOR_SIZE 1024
 
-enum parity
-{
-    none,
-    even,
-    odd
-}
 
-enum data_bits
+enum Parity
 {
-    CS5 = CS5,
-    CS6 = CS6,
-    CS7 = CS7,
-    CS8 = CS8
-}
+    NONE,
+    EVEN,
+    ODD
+};
 
-enum stop_bits
+enum DataBits
 {
-    one,
-    two
-}
+    FIVE,
+    SIX,
+    SEVEN,
+    EIGHT
+};
+
+enum StopBits
+{
+    ONE,
+    TWO
+};
+
+enum BaudRate
+{
+    BR300 = B300,
+    BR1200 = B1200,
+    BR9600 = B9600,
+    BR19200 = B19200,
+    BR57600 = B57600,
+    BR115200 = B115200
+};
 
 class Serial
 {
 private:
-    int rc;
-    parity par;
-    stop_bits sbits;
-    data_bits dbits;
+    BaudRate brate;
+    Parity par;
+    StopBits sbits;
+    DataBits dbits;
     struct termios tty; 
     std::string device_name;
+    int serial_port;
+    char read_buffer[SERIAL_READ_BUFFOR_SIZE];
+    int rc;
 
 public:
-    Serial(std::string device_name, int baud_rate, parity par, stop_bits sbits);
+    Serial(std::string device_name, BaudRate brate, DataBits dbits, Parity par, StopBits sbits);
     ~Serial();
-    void open();
-}
+    void Open();
+    void Close();
+    void SetTimeout(int timeout);
+    int32_t IsAvaliable();
+    void Write(std::string data);
+    std::string Read();
+};
