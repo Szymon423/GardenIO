@@ -15,8 +15,10 @@ private:
     double speedValue;
     double directionValue;
     void decode();
+    bool continiueLoop;
 public:
     WindSensor(std::string deviceName);
     ~WindSensor();
     void ReadLoop(int range);
+    void StopLoop();
 };

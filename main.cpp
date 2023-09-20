@@ -16,9 +16,18 @@ int main()
     logger::manager LOG;
     LOG.Initialize("/home/szymon/GardenIO/GardenIO.log");
 
+    WindSensor ws("/dev/ttyUSB0");  
+    std::thread wsThread(&WindSensor::ReadLoop, &ws, -1);
+    LOG_TRACE("Started Wind Sensor thread");
+
+    std::this_thread::sleep_for(std::chrono::seconds(20));
+
+
+    LOG_TRACE("Manually stop Wind Sensor");
+    ws.StopLoop();
+    wsThread.join();
+    LOG_TRACE("Wind Sensor thread finished");
     
-    WindSensor ws("/dev/ttyUSB0");
-    ws.ReadLoop(10);
 
 
 

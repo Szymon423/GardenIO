@@ -15,17 +15,23 @@ WindSensor::~WindSensor()
 
 void WindSensor::ReadLoop(int range)
 {
+    continiueLoop = true;
     serial.Open();
-    for (int i = 0; i < range; i++)
+    LOG_TRACE("Start Reading");
+    for (int i = 0; ((range == -1) || (i < range)) && continiueLoop; (range == -1) ? i = i : i++)
     {
         while (serial.IsAvaliable() < 14)
         {
+            if (!continiueLoop) break;
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
+        if (!continiueLoop) break;
         rawDataBuff = serial.Read();
         decode();
         LOG_TRACE("Speed: {} m/s, Direction: {} deg", speedValue, directionValue);
     }
+    LOG_TRACE("Finished Reading");
+    continiueLoop  = false;
 }
 
 void WindSensor::decode()
@@ -35,8 +41,6 @@ void WindSensor::decode()
     {
         decodedDataBuff += static_cast<char>(rawDataBuff[i]) & (~64);
     }
-    LOG_TRACE("Raw: {}", rawDataBuff);
-    LOG_TRACE("Decoded: {}", decodedDataBuff);
     if (decodedDataBuff.substr(10, 1) == "0")
     {
         speed = decodedDataBuff.substr(10, 2).insert(1, ".");
@@ -48,4 +52,9 @@ void WindSensor::decode()
     direction = decodedDataBuff.substr(5, 3);
     speedValue = std::stod(speed);
     directionValue = std::stod(direction);
+}
+
+void WindSensor::StopLoop()
+{
+    continiueLoop = false;
 }
