@@ -1,7 +1,8 @@
 - [x] Implement protocol for my wind sensor - direction and speed readings
 - [x] Put MQTT into Protocols Directory
+- [x] Run wind ReadLoop on thread
+- [ ] Change sqlite_wrapper to use std::string in constructor
 - [ ] Make wind readings as analog signals and parse them to DB
-- [ ] Run wind ReadLoop on thread
 - [ ] Implement analog/binary signals parser for mqtt payload
 - [ ] Add libmodbus to the project as another communication protocol
 - [ ] Implement archivisor class so it can do backups every <X> hours/days/...
