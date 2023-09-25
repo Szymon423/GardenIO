@@ -10,9 +10,9 @@ private:
     sqlite3 *db;
     char *zErrMsg = 0;
     int rc;
-    const char * db_path;
+    std::string db_path;
 public:
-    sqlite_wrapper(const char *db_path);
+    sqlite_wrapper(std::string db_path);
     ~sqlite_wrapper();
     int connect();
     int disconnect();

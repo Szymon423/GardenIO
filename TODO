@@ -1,9 +1,43 @@
 - [x] Implement protocol for my wind sensor - direction and speed readings
 - [x] Put MQTT into Protocols Directory
 - [x] Run wind ReadLoop on thread
-- [ ] Change sqlite_wrapper to use std::string in constructor
+- [x] Change sqlite_wrapper to use std::string in constructor
 - [ ] Make wind readings as analog signals and parse them to DB
 - [ ] Implement analog/binary signals parser for mqtt payload
 - [ ] Add libmodbus to the project as another communication protocol
 - [ ] Implement archivisor class so it can do backups every <X> hours/days/...
 - [ ] Implement raporting mechanism - not sure if it's okay to put it here or maybe better place is web interface
+
+
+<!-- explicit version -->
+<msg>                           <!-- analog signal message -->
+    <src>x<src/>                <!-- 0 = server, 1 = redundant server, x = node number --->
+    <type>0</type>              <!-- 0 = analog, 1 = binary, 2 = log data (use just <log>) --->
+    <log>log message</log>      <!-- log message in plain text-->
+    <time>time</time>           <!-- number of seconds elapsed since 00:00:00 hours, GMT (Greenwich Mean Time), January 1, 1970 -->
+    <value>value</value>        <!-- process value -->
+    <unit>unit</unit>           <!-- process value unit -->
+    <valid>valid</valid>        <!-- valid = 1 - valid / 0 - not valid -->
+    <action>x</action>          <!-- x = order / info -->
+    <archive>archive</archive>  <!-- archive = 1 - yes / 0 - no -->
+</msg>
+
+<!-- explicit version example -->
+<msg><src>0<src/><type>1</type><log>TurnOnLights</log><time>1695666135</time><value>1</value><unit></unit><valid>1</valid><action>0</action><archive>1</archive></msg>
+
+
+<!-- compressed version -->
+<a>                            <!-- analog signal message -->
+    <b>x</b>                   <!-- 0 = server, 1 = redundant server, x = node number --->
+    <c>0</c>                   <!-- 0 = analog, 1 = binary, 2 = log data (use just <log>) --->
+    <d>log message</d>         <!-- log message in plain text-->
+    <e>time</e>                <!-- number of seconds elapsed since 00:00:00 hours, GMT (Greenwich Mean Time), January 1, 1970 -->
+    <f>value</f>               <!-- process value -->
+    <g>unit</g>                <!-- process value unit -->
+    <h>valid</h>               <!-- valid = 1 - valid / 0 - not valid -->
+    <i>x</i>                   <!-- x = 0 - order / 1 - info -->
+    <j>archive</j>             <!-- archive = 1 - yes / 0 - no -->
+</a>
+
+<!-- compressed version example -->
+<a><b>0</b><c>1</c><d>TurnOnLights</d><e>1695666135</e><f>1</f><g></g><h>1</h><i>0</i><j>1</j></a>

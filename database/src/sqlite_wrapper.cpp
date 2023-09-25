@@ -4,7 +4,7 @@
 #include <iostream>
 #include "log.hpp"
 
-sqlite_wrapper::sqlite_wrapper(const char *db_path) : db_path(db_path) {}
+sqlite_wrapper::sqlite_wrapper(std::string db_path) : db_path(db_path) {}
 
 sqlite_wrapper::~sqlite_wrapper()
 {
@@ -13,7 +13,8 @@ sqlite_wrapper::~sqlite_wrapper()
 
 int sqlite_wrapper::connect()
 {
-    rc = sqlite3_open(db_path, &db);
+    const char *path {db_path.c_str()};
+    rc = sqlite3_open(path, &db);
 
     if (rc)
     {

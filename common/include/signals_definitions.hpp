@@ -70,4 +70,12 @@ namespace signals
         }
     };
 
+    
+    std::string putOnBrackets(std::string tag, std::string value);
+    std::string composeMessage(signals::analog_signal_t signal, std::string log="");
+    std::string composeMessage(signals::binary_signal_t signal, std::string log="");
+
+    std::string getByTag(std::string tag, std::string const &msg);
+    void decomposeMessage(std::string msg, signals::analog_signal_t &signal);
+    void decomposeMessage(std::string msg, signals::binary_signal_t &signal);
 }
