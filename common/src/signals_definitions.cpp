@@ -1,6 +1,6 @@
 #include "signals_definitions.hpp"
 #include "log.hpp"
-#include <bits/stdc++.h>
+// #include <bits/stdc++.h>
 #include <cstring>
 
 
@@ -39,7 +39,7 @@ signals::actionType signals::stringToActionType(std::string typeString)
 }
 
 
-std::string SignalTypeToString(signals::signalType type)
+std::string signals::signalTypeToString(signals::signalType type)
 {
     switch (type)
     {
@@ -53,7 +53,7 @@ std::string SignalTypeToString(signals::signalType type)
 }
 
 
-std::string SignalTypeToStringHuman(signals::signalType type)
+std::string signals::signalTypeToStringHuman(signals::signalType type)
 {
     switch (type)
     {
@@ -67,7 +67,7 @@ std::string SignalTypeToStringHuman(signals::signalType type)
 }
 
 
-signals::signalType stringToSignalType(std::string typeString)
+signals::signalType signals::stringToSignalType(std::string typeString)
 {
     if (typeString.find("0") != std::string::npos) return signals::signalType::analog;
     else if (typeString.find("1") != std::string::npos) return signals::signalType::binary;
@@ -75,26 +75,26 @@ signals::signalType stringToSignalType(std::string typeString)
 }
 
 
-signals::analog_signal_t::analog_signal_t(time_t c, double value, std::string unit, int8_t valid, std::string source, actionType action, int8_t archive)
+signals::analog_signal_t::analog_signal_t(time_t _time, double _value, std::string _unit, int8_t _valid, std::string _source, actionType _action, int8_t _archive)
 {
-    this->time = time;
-    this->value = value;
-    this->unit = unit;
-    this->valid = valid;
-    this->source = source;
-    this->action = action;
-    this->archive = archive;
+    this->time = _time;
+    this->value = _value;
+    this->unit = _unit;
+    this->valid = _valid;
+    this->source = _source;
+    this->action = _action;
+    this->archive = _archive;
 }
 
 
-signals::binary_signal_t::binary_signal_t(time_t c, double value, int8_t valid, std::string source, actionType action, int8_t archive)
+signals::binary_signal_t::binary_signal_t(time_t _time, double _value, int8_t _valid, std::string _source, actionType _action, int8_t _archive)
 {
-    this->time = time;
-    this->value = value;
-    this->valid = valid;
-    this->source = source;
-    this->action = action;
-    this->archive = archive;
+    this->time = _time;
+    this->value = _value;
+    this->valid = _valid;
+    this->source = _source;
+    this->action = _action;
+    this->archive = _archive;
 }
 
 
@@ -125,7 +125,7 @@ std::string signals::composeMessage(signals::binary_signal_t signal, std::string
     msg += signals::putOnBrackets("src", signal.source);
     msg += signals::putOnBrackets("type", "1");
     msg += signals::putOnBrackets("log", log);
-    msg += signals::putOnBrackets("time", std::to_string(signal.time));
+    msg += signals::putOnBrackets("time", std::to_string((long long)signal.time));
     msg += signals::putOnBrackets("value", std::to_string(signal.value));
     msg += signals::putOnBrackets("unit", "");
     msg += signals::putOnBrackets("valid", std::to_string(signal.valid));
@@ -135,9 +135,9 @@ std::string signals::composeMessage(signals::binary_signal_t signal, std::string
 }
 
 
-std::string signals::getByTag(std::string tag, std::string const &msg)
+std::string signals::getByTag(std::string tag, std::string &msg)
 {
-    std::size_t startPos = msg.find("<" + tag + ">");
+    std::size_t startPos = msg.find("<" + tag + ">") + 2 + tag.length();
     std::size_t endPos = msg.find("</" + tag + ">");
     if (startPos != std::string::npos && endPos != std::string::npos)
     {
@@ -158,7 +158,8 @@ void signals::decomposeMessage(std::string msg, signals::signal_t &signal)
     std::time_t time;
     try
     {
-        time = std::stoll(signals::getByTag("time", msg), nullptr, 10);
+        LOG_TRACE("time: {}", signals::getByTag("time", msg));
+        time = (time_t)std::stoll(signals::getByTag("time", msg), nullptr, 10);
     }
     catch(...)
     {
@@ -169,6 +170,7 @@ void signals::decomposeMessage(std::string msg, signals::signal_t &signal)
     uint8_t valid = 0;
     try
     {
+        LOG_TRACE("valid: {}", signals::getByTag("valid", msg));
         valid = std::stoi(signals::getByTag("valid", msg));
     }
     catch(...)
@@ -176,11 +178,13 @@ void signals::decomposeMessage(std::string msg, signals::signal_t &signal)
         LOG_ERROR("Can't convert valid string to uint8_t");
     }
 
+    LOG_TRACE("action: {}", signals::getByTag("action", msg));
     signals::actionType aType = signals::stringToActionType(signals::getByTag("action", msg));
     
     uint8_t archive = 0;
     try
     {
+        LOG_TRACE("archive: {}", signals::getByTag("archive", msg));
         archive = std::stoi(signals::getByTag("archive", msg));
     }
     catch(...)
@@ -195,6 +199,7 @@ void signals::decomposeMessage(std::string msg, signals::signal_t &signal)
             double value;
             try
             {
+                LOG_TRACE("value: {}", signals::getByTag("value", msg));
                 value = std::stod(signals::getByTag("value", msg));
             }
             catch(...)
@@ -202,8 +207,10 @@ void signals::decomposeMessage(std::string msg, signals::signal_t &signal)
                 LOG_ERROR("Can't convert value string to double");
             }
 
+            LOG_TRACE("unit: {}", signals::getByTag("unit", msg));
             std::string unit = signals::getByTag("unit", msg);
 
+            LOG_TRACE("value double: {}", value);
             signals::analog_signal_t my_signal(time, value, unit, valid, source, aType, archive);
             signal = my_signal;
             break;
@@ -213,6 +220,7 @@ void signals::decomposeMessage(std::string msg, signals::signal_t &signal)
             uint8_t value;
             try
             {
+                LOG_TRACE("value: {}", signals::getByTag("value", msg));
                 value = std::stoi(signals::getByTag("value", msg));
             }
             catch(...)

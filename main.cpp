@@ -16,18 +16,15 @@ int main()
     logger::manager LOG;
     LOG.Initialize("/home/szymon/GardenIO/GardenIO.log");
 
-    WindSensor ws("/dev/ttyUSB0");  
-    std::thread wsThread(&WindSensor::ReadLoop, &ws, -1);
-    LOG_TRACE("Started Wind Sensor thread");
+    signals::analog_signal_t my_analog(time(NULL), 1.234, "m/s", 1, "0", signals::actionType::info, 0);
 
-    std::this_thread::sleep_for(std::chrono::seconds(20));
+    std::string composedMsg = signals::composeMessage(my_analog);
+    LOG_TRACE("oryginal signal: {}", std::string(my_analog));
 
+    signals::analog_signal_t new_analog;
 
-    LOG_TRACE("Manually stop Wind Sensor");
-    ws.StopLoop();
-    wsThread.join();
-    LOG_TRACE("Wind Sensor thread finished");
-    
+    signals::decomposeMessage(composedMsg, new_analog);
+    LOG_TRACE("new signal: {}", std::string(new_analog));
 
 
 
@@ -38,10 +35,17 @@ int main()
 
 
 
+    // WindSensor ws("/dev/ttyUSB0");  
+    // std::thread wsThread(&WindSensor::ReadLoop, &ws, -1);
+    // LOG_TRACE("Started Wind Sensor thread");
+
+    // std::this_thread::sleep_for(std::chrono::seconds(20));
 
 
-
-
+    // LOG_TRACE("Manually stop Wind Sensor");
+    // ws.StopLoop();
+    // wsThread.join();
+    // LOG_TRACE("Wind Sensor thread finished");
 
     // MQTT mqtt;
     // mqtt.initialize();

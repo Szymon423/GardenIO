@@ -17,22 +17,21 @@ namespace signals
         analog,
         unknownSignal
     };
-
+    
     std::string signalTypeToString(signalType type);
     std::string signalTypeToStringHuman(signalType type);
     signalType stringToSignalType(std::string typeString);
-    
+
     enum actionType
     {
         order,                                  // master to slaves
         info,                                   // slaves to master
         unknownAction                                 // some problems occured during actions
     };
-    
+
     std::string actionTypeToString(actionType type);
     std::string actionTypeToStringHuman(actionType type);
     actionType stringToActionType(std::string typeString);
-
 
     class signal_t
     {
@@ -65,7 +64,7 @@ namespace signals
             ret += ", archive: " + std::to_string(archive);
             return ret;
         }
-
+        analog_signal_t() = default;
         analog_signal_t(time_t time, double value, std::string unit, int8_t valid, std::string source, actionType action, int8_t archive);
     };
 
@@ -89,6 +88,7 @@ namespace signals
             return ret;
         }
 
+        binary_signal_t() = default;
         binary_signal_t(time_t time, double value, int8_t valid, std::string source, actionType action, int8_t archive);
     };
 
@@ -97,6 +97,6 @@ namespace signals
     std::string composeMessage(signals::analog_signal_t signal, std::string log="");
     std::string composeMessage(signals::binary_signal_t signal, std::string log="");
 
-    std::string getByTag(std::string tag, std::string const &msg);
+    std::string getByTag(std::string tag, std::string &msg);
     void decomposeMessage(std::string msg, signals::signal_t &signal);
 }
