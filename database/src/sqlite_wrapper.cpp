@@ -108,10 +108,10 @@ int sqlite_wrapper::insert(signals::analog_signal_t signal)
     std::string sql_s = "INSERT INTO ANALOGS (time,value,unit,valid,source,type) ";
     sql_s += "VALUES (" + std::to_string(signal.time) + ", ";
     sql_s += std::to_string(signal.value) + ",";
-    sql_s += "\'" + std::string(signal.unit) + "',";
+    sql_s += "\'" + signal.unit + "',";
     sql_s += std::to_string(signal.valid) + ",";
-    sql_s += "\'" + std::string(signal.source) + "',";
-    sql_s += std::to_string(signal.type) + ");";
+    sql_s += "\'" + signal.source + "',";
+    sql_s += std::to_string(signal.action) + ");";
 
     char const *sql = const_cast<char*>(sql_s.c_str());
 
@@ -150,8 +150,8 @@ int sqlite_wrapper::insert(signals::binary_signal_t signal)
     sql_s += "VALUES (" + std::to_string(signal.time) + ", ";
     sql_s += std::to_string(signal.value) + ",";
     sql_s += std::to_string(signal.valid) + ",";
-    sql_s += "\'" + std::string(signal.source) + "',";
-    sql_s += std::to_string(signal.type) + ");";
+    sql_s += "\'" + signal.source + "',";
+    sql_s += std::to_string(signal.action) + ");";
 
     char const *sql = const_cast<char*>(sql_s.c_str());
 
@@ -180,10 +180,9 @@ int sqlite_wrapper::insert(signals::binary_signal_t signal)
 
 int sqlite_wrapper::callback(void *NotUsed, int argc, char **argv, char **azColName) 
 {
-   int i;
-   for(i = 0; i<argc; i++) {
-      printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
-   }
-   printf("\n");
-   return 0;
+    for(int i = 0; i < argc; i++)
+    {
+        LOG_TRACE("{} = {}", azColName[i], argv[i] ? argv[i] : "NULL");
+    }
+    return 0;
 }

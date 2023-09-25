@@ -73,7 +73,7 @@ int main()
     // strcpy(my_struct.unit, "*C");
     // my_struct.valid = 1;
     // strcpy(my_struct.source, "test");
-    // my_struct.type = signals::signal_type::info;
+    // my_struct.type = signals::actionType::info;
 
 
     // LOG_TRACE(std::string(my_struct));
