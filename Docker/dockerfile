@@ -1,8 +1,11 @@
 FROM asuracodes/work:cm4
+# FROM armv7/armhf-debian
+# FROM wpilib/raspbian-cross-ubuntu
 
-# make it up to date
-RUN apt update && apt install -y
+# ARG UBUNTU=22.04
+# FROM wpilib/ubuntu-base:${UBUNTU}
 
+RUN apt update -y
 # add c/c++
 RUN apt install -y cmake
 RUN apt install -y gcc-arm-linux-gnueabihf
@@ -10,10 +13,3 @@ RUN apt install -y g++-arm-linux-gnueabihf
 RUN apt install -y sqlite3 libsqlite3-dev
 RUN apt install -y libspdlog-dev
 RUN apt install -y mosquitto mosquitto-clients libmosquitto-dev
-# RUN sudo apt install -y git
-# RUN git clone https://github.com/eclipse/paho.mqtt.c.git
-# RUN cd paho.mqtt.c
-# RUN git checkout v1.3.8
-# RUN cmake -Bbuild -H. -DPAHO_ENABLE_TESTING=OFF -DPAHO_BUILD_STATIC=ON -DPAHO_WITH_SSL=ON -DPAHO_HIGH_PERFORMANCE=ON
-# RUN sudo cmake --build build/ --target install
-# RUN sudo ldconfig

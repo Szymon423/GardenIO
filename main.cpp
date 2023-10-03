@@ -16,14 +16,12 @@ int main()
     logger::manager LOG;
     LOG.Initialize("/home/szymon/GardenIO/GardenIO.log");
 
-    signals::analog_signal_t my_analog(time(NULL), 1.234, "m/s", 1, "0", signals::actionType::info, 0);
+    signals::Signal my_analog(signals::signalType::Analog, time(NULL), 1.234, "m/s", 1, "0", signals::actionType::info, 0);
 
     std::string composedMsg = signals::composeMessage(my_analog);
     LOG_TRACE("oryginal signal: {}", std::string(my_analog));
 
-    signals::analog_signal_t new_analog;
-
-    signals::decomposeMessage(composedMsg, new_analog);
+    signals::Signal new_analog = signals::decomposeMessage(composedMsg);
     LOG_TRACE("new signal: {}", std::string(new_analog));
 
 

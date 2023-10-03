@@ -4,16 +4,19 @@
 #include <iostream>
 #include "log.hpp"
 
+
 sqlite_wrapper::sqlite_wrapper(std::string db_path) : db_path(db_path) {}
+
 
 sqlite_wrapper::~sqlite_wrapper()
 {
     sqlite3_close(db);
 }
 
+
 int sqlite_wrapper::connect()
 {
-    const char *path {db_path.c_str()};
+    const char *path {  db_path.c_str() };
     rc = sqlite3_open(path, &db);
 
     if (rc)
@@ -30,11 +33,13 @@ int sqlite_wrapper::connect()
     return 0;
 }
 
+
 int sqlite_wrapper::disconnect()
 {
     sqlite3_close(db);
     return 0;
 }
+
 
 int sqlite_wrapper::create_tables()
 {
@@ -99,22 +104,40 @@ int sqlite_wrapper::create_tables()
     return 0;
 }
 
-int sqlite_wrapper::insert(signals::analog_signal_t signal)
+
+int sqlite_wrapper::insert(signals::Signal signal)
 {
     int ret = this->connect();
     if (ret != 0) return -1;
 
     // create include statement
-    std::string sql_s = "INSERT INTO ANALOGS (time,value,unit,valid,source,type) ";
-    sql_s += "VALUES (" + std::to_string(signal.time) + ", ";
-    sql_s += std::to_string(signal.value) + ",";
-    sql_s += "\'" + signal.unit + "',";
-    sql_s += std::to_string(signal.valid) + ",";
-    sql_s += "\'" + signal.source + "',";
-    sql_s += std::to_string(signal.action) + ");";
+    std::string sql_s;
+    switch (signal.type)
+    {
+        case signals::signalType::Analog:
+        {
+            sql_s = "INSERT INTO ANALOGS (time,value,unit,valid,source,type) ";
+            sql_s += "VALUES (" + std::to_string(signal.time) + ", ";
+            sql_s += std::to_string(signal.value.Analog) + ",";
+            sql_s += "\'" + signal.unit + "',";
+            sql_s += std::to_string(signal.valid) + ",";
+            sql_s += "\'" + signal.source + "',";
+            sql_s += signals::actionTypeToString(signal.action) + ");";
+            break;
+        }
+        case signals::signalType::Binary:
+        {
+            std::string sql_s = "INSERT INTO BINARIES (time,value,valid,source,type) ";
+            sql_s += "VALUES (" + std::to_string(signal.time) + ", ";
+            sql_s += std::to_string(signal.value.Binary) + ",";
+            sql_s += std::to_string(signal.valid) + ",";
+            sql_s += "\'" + signal.source + "',";
+            sql_s += signals::actionTypeToString(signal.action) + ");";
+            break;
+        }
+    } 
 
     char const *sql = const_cast<char*>(sql_s.c_str());
-
 
     rc = sqlite3_exec(db, sql, sqlite_wrapper::callback, 0, &zErrMsg);
 
@@ -128,11 +151,20 @@ int sqlite_wrapper::insert(signals::analog_signal_t signal)
     }
     else
     {
-        LOG_TRACE("Inserted into ANALOGS successfully");
-        // std::cout << "Inserted into ANALOGS successfully" << std::endl;
+        switch (signal.type)
+        {
+            case signals::signalType::Analog:
+            {
+                LOG_TRACE("Inserted into ANALOGS successfully");
+                break;
+            }
+            case signals::signalType::Binary:
+            {
+                LOG_TRACE("Inserted into BINARIES successfully");
+                break;
+            }
+        }    
     }
-
-    
 
     ret = this->disconnect();
     if (ret != 0) return -1;
@@ -140,43 +172,6 @@ int sqlite_wrapper::insert(signals::analog_signal_t signal)
     return 0;
 }
 
-int sqlite_wrapper::insert(signals::binary_signal_t signal)
-{
-    int ret = this->connect();
-    if (ret != 0) return -1;
-
-    // create include statement
-    std::string sql_s = "INSERT INTO BINARIES (time,value,valid,source,type) ";
-    sql_s += "VALUES (" + std::to_string(signal.time) + ", ";
-    sql_s += std::to_string(signal.value) + ",";
-    sql_s += std::to_string(signal.valid) + ",";
-    sql_s += "\'" + signal.source + "',";
-    sql_s += std::to_string(signal.action) + ");";
-
-    char const *sql = const_cast<char*>(sql_s.c_str());
-
-
-    rc = sqlite3_exec(db, sql, sqlite_wrapper::callback, 0, &zErrMsg);
-
-    if (rc != SQLITE_OK)
-    {
-        LOG_ERROR("SQL error: {}", zErrMsg);
-        // std::cout << "SQL error: " << zErrMsg << std::endl;
-        sqlite3_free(zErrMsg);
-        this->disconnect();
-        return -1;
-    }
-    else
-    {
-        LOG_TRACE("Table BINARIES created successfully");
-        // std::cout << "Inserted into BINARIES successfully" << std::endl;
-    }  
-
-    ret = this->disconnect();
-    if (ret != 0) return -1;
-
-    return 0;
-}
 
 int sqlite_wrapper::callback(void *NotUsed, int argc, char **argv, char **azColName) 
 {

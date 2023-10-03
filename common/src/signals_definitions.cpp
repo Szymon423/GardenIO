@@ -31,6 +31,7 @@ std::string signals::actionTypeToStringHuman(actionType type)
     }
 }
 
+
 signals::actionType signals::stringToActionType(std::string typeString)
 {
     if (typeString.find("0") != std::string::npos) return signals::actionType::order;
@@ -43,9 +44,9 @@ std::string signals::signalTypeToString(signals::signalType type)
 {
     switch (type)
     {
-        case signals::signalType::binary:
+        case signals::signalType::Binary:
             return std::string("0");
-        case signals::signalType::analog:
+        case signals::signalType::Analog:
             return std::string("1");
         default:
             return std::string("2");
@@ -57,44 +58,60 @@ std::string signals::signalTypeToStringHuman(signals::signalType type)
 {
     switch (type)
     {
-        case signals::signalType::binary:
-            return std::string("binary");
-        case signals::signalType::analog:
-            return std::string("analog");
+        case signals::signalType::Binary:
+            return std::string("Binary");
+        case signals::signalType::Analog:
+            return std::string("Analog");
         default:
-            return std::string("unknown");
+            return std::string("Unknown");
     }
 }
 
 
 signals::signalType signals::stringToSignalType(std::string typeString)
 {
-    if (typeString.find("0") != std::string::npos) return signals::signalType::analog;
-    else if (typeString.find("1") != std::string::npos) return signals::signalType::binary;
-    else return signals::signalType::unknownSignal;
+    if (typeString.find("0") != std::string::npos) return signals::signalType::Binary;
+    else if (typeString.find("1") != std::string::npos) return signals::signalType::Analog;
+    else return signals::signalType::UnknownSignal;
 }
 
 
-signals::analog_signal_t::analog_signal_t(time_t _time, double _value, std::string _unit, int8_t _valid, std::string _source, actionType _action, int8_t _archive)
+signals::Signal::Signal(signals::signalType _type, time_t _time, signals::Value _value, std::string _unit, int8_t _valid, std::string _source, signals::actionType _action, int8_t _archive)
 {
-    this->time = _time;
-    this->value = _value;
-    this->unit = _unit;
-    this->valid = _valid;
-    this->source = _source;
-    this->action = _action;
-    this->archive = _archive;
+    type = _type;
+    time = _time;
+    value = _value;
+    unit = _unit;
+    valid = _valid;
+    source = _source;
+    action = _action;
+    archive = _archive;
 }
 
 
-signals::binary_signal_t::binary_signal_t(time_t _time, double _value, int8_t _valid, std::string _source, actionType _action, int8_t _archive)
+signals::Signal::Signal(signals::signalType _type, time_t _time, double _value, std::string _unit, int8_t _valid, std::string _source, signals::actionType _action, int8_t _archive)
 {
-    this->time = _time;
-    this->value = _value;
-    this->valid = _valid;
-    this->source = _source;
-    this->action = _action;
-    this->archive = _archive;
+    type = _type;
+    time = _time;
+    value.Analog = _value;
+    unit = _unit;
+    valid = _valid;
+    source = _source;
+    action = _action;
+    archive = _archive;
+}
+
+
+signals::Signal::Signal(signals::signalType _type, time_t _time, int8_t _value, std::string _unit, int8_t _valid, std::string _source, signals::actionType _action, int8_t _archive)
+{
+    type = _type;
+    time = _time;
+    value.Binary = _value;
+    unit = _unit;
+    valid = _valid;
+    source = _source;
+    action = _action;
+    archive = _archive;
 }
 
 
@@ -104,30 +121,22 @@ std::string signals::putOnBrackets(std::string tag, std::string value)
 }
 
 
-std::string signals::composeMessage(signals::analog_signal_t signal, std::string log)
+std::string signals::composeMessage(signals::Signal signal, std::string log)
 {
     std::string msg = "";
     msg += signals::putOnBrackets("src", signal.source);
-    msg += signals::putOnBrackets("type", "0");
+    msg += signals::putOnBrackets("type", signals::signalTypeToString(signal.type));
     msg += signals::putOnBrackets("log", log);
     msg += signals::putOnBrackets("time", std::to_string(signal.time));
-    msg += signals::putOnBrackets("value", std::to_string(signal.value));
-    msg += signals::putOnBrackets("unit", signal.unit);
-    msg += signals::putOnBrackets("valid", std::to_string(signal.valid));
-    msg += signals::putOnBrackets("action", signals::actionTypeToString(signal.action));
-    msg += signals::putOnBrackets("archive", std::to_string(signal.archive));
-    return signals::putOnBrackets("msg", msg);
-}
-
-std::string signals::composeMessage(signals::binary_signal_t signal, std::string log)
-{
-    std::string msg = "";
-    msg += signals::putOnBrackets("src", signal.source);
-    msg += signals::putOnBrackets("type", "1");
-    msg += signals::putOnBrackets("log", log);
-    msg += signals::putOnBrackets("time", std::to_string((long long)signal.time));
-    msg += signals::putOnBrackets("value", std::to_string(signal.value));
-    msg += signals::putOnBrackets("unit", "");
+    if (signal.type == signals::signalType::Analog)
+    {
+        msg += signals::putOnBrackets("value", std::to_string(signal.value.Analog));
+        msg += signals::putOnBrackets("unit", signal.unit);
+    }
+    else 
+    {
+        msg += signals::putOnBrackets("value", std::to_string(signal.value.Binary));
+    }
     msg += signals::putOnBrackets("valid", std::to_string(signal.valid));
     msg += signals::putOnBrackets("action", signals::actionTypeToString(signal.action));
     msg += signals::putOnBrackets("archive", std::to_string(signal.archive));
@@ -150,15 +159,17 @@ std::string signals::getByTag(std::string tag, std::string &msg)
 }
 
 
-void signals::decomposeMessage(std::string msg, signals::signal_t &signal)
+signals::Signal signals::decomposeMessage(std::string msg)
 {
     std::string source = signals::getByTag("src", msg);
     signals::signalType sType = signals::stringToSignalType(signals::getByTag("type", msg));
     std::string log = signals::getByTag("log", msg);
+    
+    signals::signalType type = signals::stringToSignalType(signals::getByTag("type", msg));
+        
     std::time_t time;
     try
     {
-        LOG_TRACE("time: {}", signals::getByTag("time", msg));
         time = (time_t)std::stoll(signals::getByTag("time", msg), nullptr, 10);
     }
     catch(...)
@@ -170,7 +181,6 @@ void signals::decomposeMessage(std::string msg, signals::signal_t &signal)
     uint8_t valid = 0;
     try
     {
-        LOG_TRACE("valid: {}", signals::getByTag("valid", msg));
         valid = std::stoi(signals::getByTag("valid", msg));
     }
     catch(...)
@@ -178,13 +188,11 @@ void signals::decomposeMessage(std::string msg, signals::signal_t &signal)
         LOG_ERROR("Can't convert valid string to uint8_t");
     }
 
-    LOG_TRACE("action: {}", signals::getByTag("action", msg));
-    signals::actionType aType = signals::stringToActionType(signals::getByTag("action", msg));
+    signals::actionType action = signals::stringToActionType(signals::getByTag("action", msg));
     
     uint8_t archive = 0;
     try
     {
-        LOG_TRACE("archive: {}", signals::getByTag("archive", msg));
         archive = std::stoi(signals::getByTag("archive", msg));
     }
     catch(...)
@@ -192,46 +200,37 @@ void signals::decomposeMessage(std::string msg, signals::signal_t &signal)
         LOG_ERROR("Can't convert archive string to uint8_t");
     }
 
-    switch (sType)
+    signals::Value value;
+    switch (type)
     {
-        case signals::signalType::analog:
+        case signals::signalType::Analog:
         {
-            double value;
             try
             {
-                LOG_TRACE("value: {}", signals::getByTag("value", msg));
-                value = std::stod(signals::getByTag("value", msg));
+                value.Analog = std::stod(signals::getByTag("value", msg));
             }
             catch(...)
             {
                 LOG_ERROR("Can't convert value string to double");
             }
-
-            LOG_TRACE("unit: {}", signals::getByTag("unit", msg));
-            std::string unit = signals::getByTag("unit", msg);
-
-            LOG_TRACE("value double: {}", value);
-            signals::analog_signal_t my_signal(time, value, unit, valid, source, aType, archive);
-            signal = my_signal;
             break;
         }
-        case signals::signalType::binary:
+        case signals::signalType::Binary:
         {
-            uint8_t value;
             try
             {
-                LOG_TRACE("value: {}", signals::getByTag("value", msg));
-                value = std::stoi(signals::getByTag("value", msg));
+                value.Binary = std::stoi(signals::getByTag("value", msg));
             }
             catch(...)
             {
                 LOG_ERROR("Can't convert value string to uint8_t");
             }
-
-            signals::binary_signal_t my_signal(time, value, valid, source, aType, archive);
-            signal = my_signal;
             break;
         }
-        return;
     }
+
+    std::string unit = signals::getByTag("unit", msg);
+
+    signals::Signal signal(type, time, value, unit, valid, source, action, archive);
+    return signal; 
 }
