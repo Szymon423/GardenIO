@@ -10,14 +10,14 @@
 #define SERIAL_READ_BUFFOR_SIZE 1024
 
 
-enum Parity
+enum class Parity
 {
     NONE,
     EVEN,
     ODD
 };
 
-enum DataBits
+enum class DataBits
 {
     FIVE,
     SIX,
@@ -25,7 +25,7 @@ enum DataBits
     EIGHT
 };
 
-enum StopBits
+enum class StopBits
 {
     ONE,
     TWO

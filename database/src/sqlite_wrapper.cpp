@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
+#include <mutex>
 #include "log.hpp"
 
 
@@ -107,6 +108,7 @@ int sqlite_wrapper::create_tables()
 
 int sqlite_wrapper::insert(signals::Signal signal)
 {
+    std::scoped_lock lock(mtx);
     int ret = this->connect();
     if (ret != 0) return -1;
 

@@ -15,16 +15,22 @@ int main()
 {
     logger::manager LOG;
     LOG.Initialize("/home/szymon/GardenIO/GardenIO.log");
+    
+    sqlite_wrapper db("/home/szymon/GardenIO/database/test.db");
+    int ret = db.create_tables();
+
 
     signals::Signal my_analog(signals::signalType::Analog, time(NULL), 1.234, "m/s", 1, "0", signals::actionType::info, 0);
 
     std::string composedMsg = signals::composeMessage(my_analog);
-    LOG_TRACE("oryginal signal: {}", std::string(my_analog));
+    LOG_TRACE("old: {}", std::string(my_analog));
+    
+    ret = db.insert(my_analog);
 
     signals::Signal new_analog = signals::decomposeMessage(composedMsg);
-    LOG_TRACE("new signal: {}", std::string(new_analog));
+    LOG_TRACE("new: {}", std::string(new_analog));
 
-
+    ret = db.insert(new_analog);
 
 
 

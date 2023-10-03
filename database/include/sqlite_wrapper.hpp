@@ -3,6 +3,8 @@
 #include "sqlite3.h"
 #include "signals_definitions.hpp"
 
+#include <mutex>
+
 // https://www.tutorialspoint.com/sqlite/sqlite_c_cpp.htm
 class sqlite_wrapper
 {
@@ -11,6 +13,7 @@ private:
     char *zErrMsg = 0;
     int rc;
     std::string db_path;
+    std::mutex mtx;
 public:
     sqlite_wrapper(std::string db_path);
     ~sqlite_wrapper();
