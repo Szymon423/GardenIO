@@ -22,5 +22,4 @@ public:
     int create_tables();
     int insert(signals::Signal signal);
     static int callback(void *NotUsed, int argc, char **argv, char **azColName);
-    
 };

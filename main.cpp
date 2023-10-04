@@ -19,37 +19,37 @@ int main()
     sqlite_wrapper db("/home/szymon/GardenIO/database/test.db");
     int ret = db.create_tables();
 
+    WindSensor ws("/dev/ttyUSB0", &db);  
+    std::thread wsThread(&WindSensor::ReadLoop, &ws, -1);
+    LOG_TRACE("Started Wind Sensor thread");
 
-    signals::Signal my_analog(signals::signalType::Analog, time(NULL), 1.234, "m/s", 1, "0", signals::actionType::info, 0);
+    std::this_thread::sleep_for(std::chrono::seconds(20));
 
-    std::string composedMsg = signals::composeMessage(my_analog);
-    LOG_TRACE("old: {}", std::string(my_analog));
+
+
+
+
+
+
+
+
+
+    // signals::Signal my_analog(signals::signalType::Analog, time(NULL), 1.234, "m/s", 1, "0", signals::actionType::info, 0);
+
+    // std::string composedMsg = signals::composeMessage(my_analog);
+    // LOG_TRACE("old: {}", std::string(my_analog));
     
-    ret = db.insert(my_analog);
+    // ret = db.insert(my_analog);
 
-    signals::Signal new_analog = signals::decomposeMessage(composedMsg);
-    LOG_TRACE("new: {}", std::string(new_analog));
+    // signals::Signal new_analog = signals::decomposeMessage(composedMsg);
+    // LOG_TRACE("new: {}", std::string(new_analog));
 
-    ret = db.insert(new_analog);
+    // ret = db.insert(new_analog);
 
-
-
-
-
-
-
-
-    // WindSensor ws("/dev/ttyUSB0");  
-    // std::thread wsThread(&WindSensor::ReadLoop, &ws, -1);
-    // LOG_TRACE("Started Wind Sensor thread");
-
-    // std::this_thread::sleep_for(std::chrono::seconds(20));
-
-
-    // LOG_TRACE("Manually stop Wind Sensor");
-    // ws.StopLoop();
-    // wsThread.join();
-    // LOG_TRACE("Wind Sensor thread finished");
+    LOG_TRACE("Manually stop Wind Sensor");
+    ws.StopLoop();
+    wsThread.join();
+    LOG_TRACE("Wind Sensor thread finished");
 
     // MQTT mqtt;
     // mqtt.initialize();

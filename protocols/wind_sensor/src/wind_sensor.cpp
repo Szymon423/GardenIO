@@ -1,9 +1,10 @@
 #include "wind_sensor.hpp"
+#include "signals_definitions.hpp"
 #include "log.hpp"
 #include <thread>
 #include <chrono>
 
-WindSensor::WindSensor(std::string deviceName) : serial(deviceName, BaudRate::BR300, DataBits::SEVEN, Parity::NONE, StopBits::ONE), deviceName(deviceName)
+WindSensor::WindSensor(std::string deviceName, sqlite_wrapper* ptr_db) : ptr_db(ptr_db), serial(deviceName, BaudRate::BR300, DataBits::SEVEN, Parity::NONE, StopBits::ONE), deviceName(deviceName)
 {
     serial.SetTimeout(2000);
 }
@@ -29,6 +30,10 @@ void WindSensor::ReadLoop(int range)
         rawDataBuff = serial.Read();
         decode();
         LOG_TRACE("Speed: {} m/s, Direction: {} deg", speedValue, directionValue);
+        signals::Signal speedSignal(signals::signalType::Analog, time(NULL), (double)speedValue, "m/s", 1, "wind speed", signals::actionType::info, 1);
+        signals::Signal directionSignal(signals::signalType::Analog, time(NULL), directionValue, "deg", 1, "wind direction", signals::actionType::info, 1);
+        int ret = ptr_db->insert(speedSignal);
+        ret = ptr_db->insert(directionSignal);
     }
     LOG_TRACE("Finished Reading");
     continiueLoop  = false;
