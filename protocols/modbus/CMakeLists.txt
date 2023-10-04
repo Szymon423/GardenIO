@@ -1,4 +1,4 @@
-add_library(modbus src/modbus+sqlite_wrapper.cpp)
+add_library(modbus src/modbus+sqlite_wrapper.cpp src/modbus_definitions.cpp)
 target_include_directories(modbus PUBLIC include)
 
 # to enable usage of signals_definitions.cpp
