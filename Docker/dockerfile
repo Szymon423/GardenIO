@@ -13,3 +13,4 @@ RUN apt install -y g++-arm-linux-gnueabihf
 RUN apt install -y sqlite3 libsqlite3-dev
 RUN apt install -y libspdlog-dev
 RUN apt install -y mosquitto mosquitto-clients libmosquitto-dev
+RUN apt install -y libmodbus-dev
