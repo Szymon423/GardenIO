@@ -144,7 +144,6 @@ void Modbus::ReadInputs()
     for (RegistersSet& set : continiousRegions_inputs)
     {
         returnedValue = modbus_read_input_bits(mb, set.startOffset, set.length, inputs[set.startOffset]);
-
     }
 }
 
@@ -170,10 +169,20 @@ void Modbus::InterpreteRegisters()
     {
         switch (modbusSignals.at(i).region)
         {
+            case ModbusRegion::COILS:
+               TranslateRegistersToValue(coils[modbusSignals.at(i).offset], &modbusSignals.at(i));
+                break;
+            case ModbusRegion::INPUTS:
+                TranslateRegistersToValue(inputs[modbusSignals.at(i).offset], &modbusSignals.at(i));
+                break;
             case ModbusRegion::HOLDING_REGISTERS:
                 TranslateRegistersToValue(holdingRegisters[modbusSignals.at(i).offset], &modbusSignals.at(i));
                 break;
+            case ModbusRegion::INPUT_REGISTERS:
+                TranslateRegistersToValue(inputRegisters[modbusSignals.at(i).offset], &modbusSignals.at(i));
+                break;
         }
+        
     }
 }
 
