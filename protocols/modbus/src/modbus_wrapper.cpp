@@ -144,6 +144,7 @@ void Modbus::ReadInputs()
     for (RegistersSet& set : continiousRegions_inputs)
     {
         returnedValue = modbus_read_input_bits(mb, set.startOffset, set.length, inputs[set.startOffset]);
+
     }
 }
 
@@ -160,5 +161,44 @@ void Modbus::ReadInputRegisters()
     for (RegistersSet& set : continiousRegions_inputRegisters)
     {
         returnedValue = modbus_read_input_registers(mb, set.startOffset, set.length, inputRegisters[set.startOffset]);
+    }
+}
+
+void Modbus::InterpreteRegisters()
+{
+    for (int i = 0; i < modbusSignals.size(); i++)
+    {
+        switch (modbusSignals.at(i).region)
+        {
+            case ModbusRegion::HOLDING_REGISTERS:
+                TranslateRegistersToValue(holdingRegisters[modbusSignals.at(i).offset], &modbusSignals.at(i));
+                break;
+        }
+    }
+}
+
+void Modbus::TranslateRegistersToValue(uint16_t* ptr_registers, ModbusSignal* ptr_signal)
+{
+    switch (ptr_signal->dataType)
+    {
+        case ModbusDataType::UINT_16:
+            ptr_signal->value.UINT_16 = ptr_registers[0];
+            break;
+        case ModbusDataType::INT_16:
+            ptr_signal->value.INT_16 = *((int16_t*)ptr_registers);
+            break;
+        case ModbusDataType::UINT_32:
+            uint32_t* ptr_proper_type = ;
+            if (ptr_signal->endian == Endian::LITTLE)
+            {
+                ptr_signal->value.UINT_32 = *((uint32_t*)ptr_registers);   
+            }
+            else
+            {
+                uint32_t high = *((uint32_t*)ptr_registers) && 0xff00;
+                uint32_t low = *((uint32_t*)ptr_registers) && 0x00ff;
+                ptr_signal->value.UINT_32 = high >> 16 | low << 16;
+            }
+            break;
     }
 }

@@ -23,8 +23,8 @@ private:
     bool keepReading;
 
 
-    uint8_t coils[MAX_COILS_NUMBER * 8];
-    uint8_t inputs[MAX_INPUTS_NUMBER * 8];
+    uint8_t coils[MAX_COILS_NUMBER];
+    uint8_t inputs[MAX_INPUTS_NUMBER];
     uint16_t holdingRegisters[MAX_HOLDING_REGISTERS_NUMBER];
     uint16_t inputRegisters[MAX_INPUT_REGISTERS_NUMBER];
 
@@ -39,6 +39,8 @@ private:
     void ReadInputs();
     void ReadHoldingRegisters();
     void ReadInputRegisters();
+    void InterpreteRegisters();
+    void TranslateRegistersToValue(uint16_t* ptr_registers, ModbusSignal* ptr_signal);
 
 
 public:
