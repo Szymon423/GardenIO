@@ -1,7 +1,9 @@
-#include <modbus.h>
+#pragma once
+
+#include <modbus/modbus.h>
 #include <string>
 #include <vector>
-
+#include <time.h>
 #include "modbus_definitions.hpp"
 
 #define MAX_COILS_NUMBER 1000
@@ -41,7 +43,7 @@ private:
     void ReadInputRegisters();
     void InterpreteRegisters();
     void TranslateRegistersToValue(uint16_t* ptr_registers, ModbusSignal* ptr_signal);
-
+    void TranslateRegistersToValue(uint8_t* ptr_registers, ModbusSignal* ptr_signal);
 
 public:
     ~Modbus() = default;

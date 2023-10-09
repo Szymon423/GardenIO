@@ -20,9 +20,10 @@ int DataTypeLength(ModbusDataType dataType)
         case ModbusDataType::INT_16: return 1;
         case ModbusDataType::UINT_32: return 2;
         case ModbusDataType::INT_32: return 2;
-        case ModbusDataType::UINT64: return 4;
+        case ModbusDataType::UINT_64: return 4;
         case ModbusDataType::INT_64: return 4;
         case ModbusDataType::FLOAT: return 2;
         case ModbusDataType::DOUBLE: return 4;
+        default: return 2;
     }
 }

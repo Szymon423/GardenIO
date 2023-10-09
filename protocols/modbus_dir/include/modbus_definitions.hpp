@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cstdint>
 
 
@@ -19,11 +21,12 @@ enum class Endian
 
 enum class ModbusDataType
 {
+    BOOL,
     UINT_16,
     INT_16,
     UINT_32,
     INT_32,
-    UINT64,
+    UINT_64,
     INT_64,
     FLOAT,
     DOUBLE
@@ -36,7 +39,7 @@ union ModbusValue
     int16_t INT_16;
     uint32_t UINT_32;
     int32_t INT_32;
-    uint64_t UINT64;
+    uint64_t UINT_64;
     int64_t INT_64;
     float FLOAT;
     double DOUBLE;
@@ -57,6 +60,7 @@ public:
 
 class ModbusSignal
 {
+public:
     Endian endian;
     ModbusDataType dataType;
     ModbusValue value;
