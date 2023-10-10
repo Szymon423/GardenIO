@@ -46,11 +46,11 @@ private:
     void TranslateRegistersToValue(uint8_t* ptr_registers, ModbusSignal* ptr_signal);
 
 public:
-    ~Modbus() = default;
     Modbus() = default;
-    void SetConnectionParams(std::string ip, int port);
-    void SetConnectionInterval(time_t interval);
-    void SetSignalsDefinitions(std::vector<ModbusSignal> signalsDefinitions);
+    ~Modbus();
+    void SetConnectionParams(std::string newIp, int newPort);
+    void SetConnectionInterval(time_t intervalTime);
+    void SetSignalsDefinitions(std::vector<ModbusSignal> inputSignalsDefinitions);
     void RunInLoop();
 };
 

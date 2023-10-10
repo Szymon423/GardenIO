@@ -1,9 +1,10 @@
 #pragma once
 
-#include "sqlite3.h"
+#include <sqlite3.h>
+#include <mutex>
+
 #include "signals_definitions.hpp"
 
-#include <mutex>
 
 // https://www.tutorialspoint.com/sqlite/sqlite_c_cpp.htm
 class sqlite_wrapper

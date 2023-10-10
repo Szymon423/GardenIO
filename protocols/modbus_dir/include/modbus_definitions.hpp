@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 
 enum class ModbusRegion
@@ -35,6 +36,7 @@ enum class ModbusDataType
 
 union ModbusValue
 {
+    bool BOOL;
     uint16_t UINT_16;
     int16_t INT_16;
     uint32_t UINT_32;
@@ -66,7 +68,15 @@ public:
     ModbusValue value;
     ModbusRegion region;
     int offset;
+
+    ModbusSignal();
+    ModbusSignal(Endian endian, ModbusDataType dataType, ModbusRegion region, int offset);
 };
 
 
 int DataTypeLength(ModbusDataType dataType);
+std::string ModbusValueToString(ModbusSignal signal);
+std::string ModbusRegionToString(ModbusRegion region);
+std::string ModbusDataTypeToString(ModbusDataType dataType);
+std::string EndianToString(Endian endian);
+std::string ModbusSignalInfo(ModbusSignal signal);

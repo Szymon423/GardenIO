@@ -5,6 +5,8 @@
 #include <chrono>
 
 #include "sqlite_wrapper.hpp"
+#include "modbus_wrapper.hpp"
+#include "modbus_definitions.hpp"
 #include "signals_definitions.hpp"
 #include "log_manager.hpp"
 #include "log.hpp"
@@ -19,11 +21,26 @@ int main()
     sqlite_wrapper db("/home/szymon/GardenIO/database/test.db");
     int ret = db.create_tables();
 
-    WindSensor ws("/dev/ttyUSB0", &db);  
-    std::thread wsThread(&WindSensor::ReadLoop, &ws, -1);
-    LOG_TRACE("Started Wind Sensor thread");
+    Modbus mb;
+    mb.SetConnectionParams("127.0.0.1", 502);
+    mb.SetConnectionInterval(3);
+    
+    std::vector<ModbusSignal> vect;
+    for (int i = 0; i < 10; i++)
+    {
+        ModbusSignal x(Endian::BIG, ModbusDataType::UINT_16, ModbusRegion::INPUT_REGISTERS, i);
+        vect.push_back(x);
+    }
+    mb.SetSignalsDefinitions(vect);
+    mb.RunInLoop();
 
-    std::this_thread::sleep_for(std::chrono::seconds(20));
+    // WindSensor ws("/dev/ttyUSB0", &db);  
+    // std::thread wsThread(&WindSensor::ReadLoop, &ws, -1);
+    // LOG_TRACE("Started Wind Sensor thread");
+
+    // std::this_thread::sleep_for(std::chrono::seconds(20));
+
+
 
 
 
@@ -46,10 +63,10 @@ int main()
 
     // ret = db.insert(new_analog);
 
-    LOG_TRACE("Manually stop Wind Sensor");
-    ws.StopLoop();
-    wsThread.join();
-    LOG_TRACE("Wind Sensor thread finished");
+    // LOG_TRACE("Manually stop Wind Sensor");
+    // ws.StopLoop();
+    // wsThread.join();
+    // LOG_TRACE("Wind Sensor thread finished");
 
     // MQTT mqtt;
     // mqtt.initialize();
