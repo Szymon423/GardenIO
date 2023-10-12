@@ -2,6 +2,13 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
+
+#include "log.hpp"
+#include <iomanip>
+#include <bitset>
+#include <string>
+#include <sstream>
 
 
 enum class ModbusRegion
@@ -80,3 +87,22 @@ std::string ModbusRegionToString(ModbusRegion region);
 std::string ModbusDataTypeToString(ModbusDataType dataType);
 std::string EndianToString(Endian endian);
 std::string ModbusSignalInfo(ModbusSignal signal);
+
+template <typename T>
+T SwapBytesInOrder(uint16_t* oryginal, std::vector<int>& order)
+{
+    T oryginalVlaue = *((T*)oryginal);
+    T newValue = 0;    
+    std::stringstream ss;
+    ss << std::bitset<32>{oryginalVlaue};
+    LOG_TRACE("oryginal: {}", ss.str());
+
+    uint8_t* ptr_oryginalVlaue = (uint8_t*)&oryginalVlaue;
+    uint8_t* ptr_newVlaue = (uint8_t*)&newValue;
+    for (int i = 0; i < sizeof(T) && order.size() == sizeof(T); i++)
+    {
+        ptr_newVlaue[i] = ptr_oryginalVlaue[order.at(i)];
+    }
+    
+    return newValue;
+}

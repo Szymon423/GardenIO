@@ -4,6 +4,10 @@
 #include <cstdlib>
 #include <vector>
 #include <cstring>
+#include <iomanip>
+#include <bitset>
+#include <string>
+#include <sstream>
 #include "log.hpp"
 
 Modbus::~Modbus()
@@ -52,10 +56,11 @@ void Modbus::RunInLoop()
         LOG_TRACE("Connected to: {}:{}", ip, port);
     }
 
-    keepReading = false;
+    keepReading = true;
     lastReadTime = time(NULL) - 2 * interval;
+    time_t firstReadTime = lastReadTime;
     LOG_TRACE("Starting reading loop with interval: {}", interval);
-    while (keepReading)
+    while (keepReading && time(NULL) < firstReadTime + 15)
     {
         if (time(NULL) > lastReadTime + interval)
         {
@@ -246,13 +251,18 @@ void Modbus::InterpreteRegisters()
                 TranslateRegistersToValue(&inputRegisters[modbusSignals.at(i).offset], &modbusSignals.at(i));
                 break;
         }
-        // LOG_TRACE("Signal {}: {}", i, ModbusValueToString(modbusSignals.at(i)));
+        LOG_TRACE("Signal {}: {}", i, ModbusValueToString(modbusSignals.at(i)));
         
     }
 }
 
 void Modbus::TranslateRegistersToValue(uint16_t* ptr_registers, ModbusSignal* ptr_signal)
 {
+    std::vector<int> order32big = { 2, 3, 0, 1 };
+    std::vector<int> order32little = { 0, 1, 3, 2 };
+    std::vector<int> order64big = { 3, 2, 1, 0, 7, 6, 5, 4 };
+    std::vector<int> order64little = { 4, 3, 2, 1, 7, 6, 5, 4 };
+    
     switch (ptr_signal->dataType)
     {
         case ModbusDataType::UINT_16:
@@ -268,30 +278,35 @@ void Modbus::TranslateRegistersToValue(uint16_t* ptr_registers, ModbusSignal* pt
         case ModbusDataType::UINT_32:
         {
             uint32_t* ptr_proper_type = nullptr;
-            if (ptr_signal->endian == Endian::LITTLE)
+            if (ptr_signal->endian == Endian::BIG)
             {
-                ptr_signal->value.UINT_32 = *((uint32_t*)ptr_registers);   
+                // ptr_signal->value.UINT_32 = *((uint32_t*)ptr_registers);   
+                ptr_signal->value.UINT_32 = SwapBytesInOrder<uint32_t>(ptr_registers, order32big);
             }
             else
             {
-                uint32_t high = *((uint32_t*)ptr_registers) && 0xff00;
-                uint32_t low = *((uint32_t*)ptr_registers) && 0x00ff;
-                ptr_signal->value.UINT_32 = high >> 16 | low << 16;
+                // uint32_t high = *((uint32_t*)ptr_registers) && 0xff00;
+                // uint32_t low = *((uint32_t*)ptr_registers) && 0x00ff;
+                // ptr_signal->value.UINT_32 = high >> 16 | low << 16;
+                ptr_signal->value.UINT_32 = SwapBytesInOrder<uint32_t>(ptr_registers, order32little);
             }
             break;
         }
         case ModbusDataType::INT_32:
         {
             int32_t* ptr_proper_type = nullptr;
-            if (ptr_signal->endian == Endian::LITTLE)
+            std::stringstream ss;
+            ss  << "0b" << std::bitset<16>{ptr_registers[0]} << std::bitset<16>{ptr_registers[1]};
+            LOG_TRACE("value: {}", ss.str());
+            if (ptr_signal->endian == Endian::BIG)
             {
-                ptr_signal->value.INT_32 = *((int32_t*)ptr_registers);   
+                ptr_signal->value.INT_32 = SwapBytesInOrder<int32_t>(ptr_registers, order32big);
             }
             else
             {
-                int32_t high = *((int32_t*)ptr_registers) && 0xff00;
-                int32_t low = *((int32_t*)ptr_registers) && 0x00ff;
-                ptr_signal->value.UINT_32 = high >> 16 | low << 16;
+                // int32_t high = *((int32_t*)ptr_registers) && 0xff00;
+                // int32_t low = *((int32_t*)ptr_registers) && 0x00ff;
+                ptr_signal->value.INT_32 = SwapBytesInOrder<int32_t>(ptr_registers, order32little);
             }
             break;
         }
@@ -299,7 +314,7 @@ void Modbus::TranslateRegistersToValue(uint16_t* ptr_registers, ModbusSignal* pt
         {
             uint32_t* ptr_uint32 = nullptr;
             float* ptr_proper_type = nullptr;
-            if (ptr_signal->endian == Endian::LITTLE)
+            if (ptr_signal->endian == Endian::BIG)
             {
                 ptr_uint32 = (uint32_t*)ptr_registers;
                 ptr_signal->value.FLOAT = *((float*)ptr_uint32);   
@@ -316,7 +331,7 @@ void Modbus::TranslateRegistersToValue(uint16_t* ptr_registers, ModbusSignal* pt
         case ModbusDataType::UINT_64:
         {
             uint64_t* ptr_proper_type = nullptr;
-            if (ptr_signal->endian == Endian::LITTLE)
+            if (ptr_signal->endian == Endian::BIG)
             {
                 ptr_signal->value.UINT_64 = *((uint64_t*)ptr_registers);   
             }
@@ -333,7 +348,7 @@ void Modbus::TranslateRegistersToValue(uint16_t* ptr_registers, ModbusSignal* pt
         case ModbusDataType::INT_64:
         {
             int64_t* ptr_proper_type = nullptr;
-            if (ptr_signal->endian == Endian::LITTLE)
+            if (ptr_signal->endian == Endian::BIG)
             {
                 ptr_signal->value.INT_64 = *((int64_t*)ptr_registers);   
             }
@@ -351,7 +366,7 @@ void Modbus::TranslateRegistersToValue(uint16_t* ptr_registers, ModbusSignal* pt
         {
             uint64_t* ptr_uint64 = nullptr;
             double* ptr_proper_type = nullptr;
-            if (ptr_signal->endian == Endian::LITTLE)
+            if (ptr_signal->endian == Endian::BIG)
             {
                 ptr_uint64 = (uint64_t*)ptr_registers;
                 ptr_signal->value.DOUBLE = *((double*)ptr_uint64);   

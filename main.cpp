@@ -16,21 +16,30 @@
 int main()
 {
     logger::manager LOG;
-    LOG.Initialize("/home/szymon/GardenIO/GardenIO.log");
+    LOG.Initialize("./GardenIO.log");
     
-    sqlite_wrapper db("/home/szymon/GardenIO/database/test.db");
+    sqlite_wrapper db("./database/test.db");
     int ret = db.create_tables();
 
     Modbus mb;
-    mb.SetConnectionParams("127.0.0.1", 502);
+    mb.SetConnectionParams("192.168.0.172", 502);
     mb.SetConnectionInterval(3);
     
     std::vector<ModbusSignal> vect;
-    for (int i = 0; i < 10; i++)
-    {
-        ModbusSignal x(Endian::BIG, ModbusDataType::UINT_16, ModbusRegion::INPUT_REGISTERS, i);
-        vect.push_back(x);
-    }
+    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::UINT_16, ModbusRegion::INPUT_REGISTERS, 0));
+    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::INT_16, ModbusRegion::INPUT_REGISTERS, 1));
+    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::UINT_32, ModbusRegion::INPUT_REGISTERS, 2));
+    vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::UINT_32, ModbusRegion::INPUT_REGISTERS, 4));
+    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::INT_32, ModbusRegion::INPUT_REGISTERS, 6));
+    vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::INT_32, ModbusRegion::INPUT_REGISTERS, 8));
+    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::UINT_64, ModbusRegion::INPUT_REGISTERS, 10));
+    vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::UINT_64, ModbusRegion::INPUT_REGISTERS, 14));
+    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::INT_64, ModbusRegion::INPUT_REGISTERS, 18));
+    vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::INT_64, ModbusRegion::INPUT_REGISTERS, 22));
+    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::FLOAT, ModbusRegion::INPUT_REGISTERS, 26));
+    vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::FLOAT, ModbusRegion::INPUT_REGISTERS, 28));
+    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::DOUBLE, ModbusRegion::INPUT_REGISTERS, 30));
+    vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::DOUBLE, ModbusRegion::INPUT_REGISTERS, 34));
     mb.SetSignalsDefinitions(vect);
     mb.RunInLoop();
 

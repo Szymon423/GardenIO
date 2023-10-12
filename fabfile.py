@@ -2,15 +2,17 @@ from fabric import task
 from fabric import Connection
 import os
 
-user = "szymon"
-password = "2ndRPI@"
+# user = "szymon"
+user = "pi"
+# password = "2ndRPI@"
+password = "1stRPI@"
 port = 22
 
 GardenIO_source_path = r"build/Release/GardenIO"
-GardenIO_target_path = r"/home/szymon/GardenIO"
+GardenIO_target_path = r"/home/" + user  + r"/GardenIO"
 
 sqlite_source_path = r"database/sqlite-autoconf-3430000.tar.gz"
-sqlite_target_path = r"/home/szymon/sqlite"
+sqlite_target_path = r"/home/" + user  + r"/sqlite"
 
 @task
 def Install(ctx):
@@ -21,18 +23,12 @@ def Install(ctx):
         c.run(GardenIO_target_path + r"/GardenIO")
 
 @task
-def InstallSQLite(ctx):
+def InstallPrerequisites(ctx):
     with Connection(host=ctx.host, user=user, port=port, connect_kwargs={'password': password}) as c:
         c.sudo("apt update")
         c.sudo("apt install -y sqlite3")
-
-@task
-def InstallMosquitto(ctx):
-    with Connection(host=ctx.host, user=user, port=port, connect_kwargs={'password': password}) as c:
-        c.sudo("apt update")
         c.sudo("apt install -y mosquitto mosquitto-clients")
-
-@task
-def PrepareSerial(ctx):
-    with Connection(host=ctx.host, user=user, port=port, connect_kwargs={'password': password}) as c:
+        c.sudo("apt install -y libspdlog-dev")
+        c.sudo("apt install -y libmodbus-dev")
         c.sudo("adduser $USER dialout")
+
