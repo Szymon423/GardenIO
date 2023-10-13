@@ -23,7 +23,8 @@ enum class ModbusRegion
 enum class Endian
 {
     BIG,
-    LITTLE
+    LITTLE,
+    NONE
 };
 
 
@@ -78,6 +79,7 @@ public:
 
     ModbusSignal();
     ModbusSignal(Endian endian, ModbusDataType dataType, ModbusRegion region, int offset);
+    ModbusSignal(ModbusDataType dataType, ModbusRegion region, int offset);
 };
 
 

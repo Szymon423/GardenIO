@@ -12,6 +12,12 @@ ModbusSignal::ModbusSignal(Endian endian, ModbusDataType dataType, ModbusRegion 
 }
 
 
+ModbusSignal::ModbusSignal(ModbusDataType dataType, ModbusRegion region, int offset)
+    : endian(Endian::NONE), dataType(dataType), region(region), offset(offset)
+{
+}
+
+
 RegistersSet::RegistersSet() : startOffset(0), length(0)
 {
 }

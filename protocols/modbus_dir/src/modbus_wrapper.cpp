@@ -182,7 +182,7 @@ void Modbus::ReadCoils()
         LOG_TRACE("Reading Coils from: {} length: {}", set.startOffset, set.length)
         uint8_t* ptr = new uint8_t[set.length];
         returnedValue = modbus_read_bits(mb, set.startOffset, set.length, ptr);
-        std::memcpy(&coils[set.startOffset], ptr, sizeof(uint8_t*) * set.length);
+        std::memcpy(&coils[set.startOffset], ptr, set.length * sizeof(uint8_t));
         delete[] ptr;
     }
 }
@@ -194,7 +194,7 @@ void Modbus::ReadInputs()
         LOG_TRACE("Reading Inputs from: {} length: {}", set.startOffset, set.length);
         uint8_t* ptr = new uint8_t[set.length];
         returnedValue = modbus_read_input_bits(mb, set.startOffset, set.length, ptr);
-        std::memcpy(&inputs[set.startOffset], ptr, sizeof(uint8_t*) * set.length);
+        std::memcpy(&inputs[set.startOffset], ptr, set.length * sizeof(uint8_t));
         delete[] ptr;
     }
 }
@@ -206,7 +206,7 @@ void Modbus::ReadHoldingRegisters()
         LOG_TRACE("Reading Holding Registers from: {} length: {}", set.startOffset, set.length)
         uint16_t* ptr = new uint16_t[set.length];
         returnedValue = modbus_read_registers(mb, set.startOffset, set.length, ptr);
-        std::memcpy(&holdingRegisters[set.startOffset], ptr, sizeof(uint16_t*) * set.length);
+        std::memcpy(&holdingRegisters[set.startOffset], ptr, set.length * sizeof(uint16_t));
         delete[] ptr;
     }
 }
@@ -215,18 +215,9 @@ void Modbus::ReadInputRegisters()
 {
     for (RegistersSet& set : continiousRegions_inputRegisters)
     {
-        LOG_TRACE("Reading Input Registers from: {} length: {}", set.startOffset, set.length)
-        // uint16_t* ptr = (uint16_t*)std::malloc(set.length * sizeof(uint16_t));
         uint16_t* ptr = new uint16_t[set.length];
-        LOG_TRACE("Allocated memory");
         returnedValue = modbus_read_input_registers(mb, set.startOffset, set.length, ptr);
-        LOG_TRACE("returnedValue: {}", returnedValue);
-        for (int i = 0; i < set.length; i++)
-        {
-            LOG_TRACE("raw at: {} is: {}", i, ptr[i]);
-        }
-        std::memcpy(&inputRegisters[set.startOffset], ptr, set.length * sizeof(uint16_t*));
-        // std::free(ptr);
+        std::memcpy(&inputRegisters[set.startOffset], ptr, set.length * sizeof(uint16_t));
         delete[] ptr;
     }
 }
