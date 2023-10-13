@@ -3,12 +3,14 @@ from fabric import Connection
 import os
 
 # user = "szymon"
-user = "pi"
-# password = "2ndRPI@"
-password = "1stRPI@"
+user = r"pi"
+compile = r"Release"
+compile = r"Debug"
+# password = r"2ndRPI@"
+password = r"1stRPI@"
 port = 22
 
-GardenIO_source_path = r"build/Release/GardenIO"
+GardenIO_source_path = r"build/" + compile + r"/GardenIO"
 GardenIO_target_path = r"/home/" + user  + r"/GardenIO"
 
 sqlite_source_path = r"database/sqlite-autoconf-3430000.tar.gz"

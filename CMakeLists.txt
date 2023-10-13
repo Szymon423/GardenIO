@@ -4,6 +4,8 @@ project(GardenIO VERSION 1.0.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CPP_STANDARD 17)
+set(CMAKE_CXX_FLAGS_DEBUG_INIT "-Wall")
+set(CMAKE_CXX_FLAGS_RELEASE_INIT "-Wall")
 # set(CMAKE_C_COMPILER gcc-arm-linux-gnueabihf)
 # set(CMAKE_CPP_COMPILER g++-arm-linux-gnueabihf)
 

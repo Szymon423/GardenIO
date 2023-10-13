@@ -94,8 +94,7 @@ T SwapBytesInOrder(uint16_t* oryginal, std::vector<int>& order)
     T oryginalVlaue = *((T*)oryginal);
     T newValue = 0;    
     std::stringstream ss;
-    ss << std::bitset<32>{oryginalVlaue};
-    LOG_TRACE("oryginal: {}", ss.str());
+    ss << std::bitset<sizeof(T) * 8>{oryginalVlaue};
 
     uint8_t* ptr_oryginalVlaue = (uint8_t*)&oryginalVlaue;
     uint8_t* ptr_newVlaue = (uint8_t*)&newValue;
