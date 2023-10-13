@@ -1,5 +1,7 @@
 #include "modbus_definitions.hpp"
 #include <string>
+#include <mutex>
+
 
 ModbusSignal::ModbusSignal()
 {
@@ -27,9 +29,29 @@ RegistersSet::RegistersSet(int startOffset, int length) : startOffset(startOffse
 {
 }
 
+
 RegistersSet::~RegistersSet()
 {
 }
+
+
+ModbusOrder::~ModbusOrder()
+{
+
+}
+
+
+ModbusOrder::ModbusOrder()
+{
+
+}
+
+
+ModbusOrder::ModbusOrder(int newSignalNumber, ModbusValue newValue)
+    : signalNumber(newSignalNumber), value(newValue)
+{
+}
+
 
 int DataTypeLength(ModbusDataType dataType)
 {
@@ -66,6 +88,7 @@ std::string ModbusValueToString(ModbusSignal signal)
     }
 }
 
+
 std::string ModbusRegionToString(ModbusRegion region)
 {
     switch (region)
@@ -77,6 +100,7 @@ std::string ModbusRegionToString(ModbusRegion region)
         default: return "Unknown";
     }
 }
+
 
 std::string ModbusDataTypeToString(ModbusDataType dataType)
 {

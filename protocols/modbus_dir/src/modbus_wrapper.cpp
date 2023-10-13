@@ -10,11 +10,13 @@
 #include <sstream>
 #include "log.hpp"
 
+
 Modbus::~Modbus()
 {
     modbus_close(mb);
     modbus_free(mb);
 }
+
 
 void Modbus::SetConnectionParams(std::string newIp, int newPort)
 {
@@ -22,14 +24,18 @@ void Modbus::SetConnectionParams(std::string newIp, int newPort)
     port = newPort;
 }
 
+
 void Modbus::SetConnectionInterval(time_t intervalTime)
 {
     interval = intervalTime;
 }
 
+
 void Modbus::SetSignalsDefinitions(std::vector<ModbusSignal> inputSignalsDefinitions)
 {
+    mtx.lock();
     modbusSignals = inputSignalsDefinitions;
+    mtx.unlock();
     LOG_TRACE("New signal definitions:");
     for (int i = 0; i < modbusSignals.size(); i++)
     {
@@ -37,6 +43,7 @@ void Modbus::SetSignalsDefinitions(std::vector<ModbusSignal> inputSignalsDefinit
     }
     CreateContiniousRegistersSet();
 }
+
 
 void Modbus::RunInLoop()
 {
@@ -74,6 +81,7 @@ void Modbus::RunInLoop()
         }
     }
 }
+
 
 void Modbus::CreateContiniousRegistersSet()
 {
@@ -118,7 +126,7 @@ void Modbus::CreateContiniousRegistersSet()
             set.length += DataTypeLength(_coils.at(i).dataType);
         }
     }
-    if (set.length != 0) continiousRegions_coils.push_back(set);
+    if (set.length != 0 && _coils.size() > 0) continiousRegions_coils.push_back(set);
 
     for (int i = 0; i < _inputs.size(); i++)
     {
@@ -136,7 +144,7 @@ void Modbus::CreateContiniousRegistersSet()
             set.length += DataTypeLength(_inputs.at(i).dataType);
         }
     }
-    if (set.length != 0) continiousRegions_inputs.push_back(set);
+    if (set.length != 0 && _inputs.size() > 0) continiousRegions_inputs.push_back(set);
 
     for (int i = 0; i < _holdingRegisters.size(); i++)
     {
@@ -154,7 +162,7 @@ void Modbus::CreateContiniousRegistersSet()
             set.length += DataTypeLength(_holdingRegisters.at(i).dataType);
         }
     }
-    if (set.length != 0) continiousRegions_holdingRegisters.push_back(set);
+    if (set.length != 0 && _holdingRegisters.size() > 0) continiousRegions_holdingRegisters.push_back(set);
 
     for (int i = 0; i < _inputRegisters.size(); i++)
     {
@@ -172,8 +180,9 @@ void Modbus::CreateContiniousRegistersSet()
             set.length += DataTypeLength(_inputRegisters.at(i).dataType);
         }
     }
-    if (set.length != 0) continiousRegions_inputRegisters.push_back(set);
+    if (set.length != 0 && _inputRegisters.size() > 0) continiousRegions_inputRegisters.push_back(set);
 }
+
 
 void Modbus::ReadCoils()
 {
@@ -187,6 +196,7 @@ void Modbus::ReadCoils()
     }
 }
 
+
 void Modbus::ReadInputs()
 {
     for (RegistersSet& set : continiousRegions_inputs)
@@ -198,6 +208,7 @@ void Modbus::ReadInputs()
         delete[] ptr;
     }
 }
+
 
 void Modbus::ReadHoldingRegisters()
 {
@@ -211,6 +222,7 @@ void Modbus::ReadHoldingRegisters()
     }
 }
 
+
 void Modbus::ReadInputRegisters()
 {
     for (RegistersSet& set : continiousRegions_inputRegisters)
@@ -222,9 +234,11 @@ void Modbus::ReadInputRegisters()
     }
 }
 
+
 void Modbus::InterpreteRegisters()
 {
     LOG_TRACE("Interpreting {} signalns", modbusSignals.size());
+    std::scoped_lock lock(mtx);
     for (int i = 0; i < modbusSignals.size(); i++)
     {
         switch (modbusSignals.at(i).region)
@@ -245,6 +259,7 @@ void Modbus::InterpreteRegisters()
         LOG_TRACE("Signal {}: {}", i, ModbusValueToString(modbusSignals.at(i)));
     }
 }
+
 
 void Modbus::TranslateRegistersToValue(uint16_t* ptr_registers, ModbusSignal* ptr_signal)
 {
@@ -350,6 +365,7 @@ void Modbus::TranslateRegistersToValue(uint16_t* ptr_registers, ModbusSignal* pt
     }
 }
 
+
 void Modbus::TranslateRegistersToValue(uint8_t* ptr_registers, ModbusSignal* ptr_signal)
 {
     switch (ptr_signal->dataType)
@@ -361,3 +377,31 @@ void Modbus::TranslateRegistersToValue(uint8_t* ptr_registers, ModbusSignal* ptr
         }
     }
 }
+
+
+void Modbus::SetSignal(ModbusOrder order)
+{
+    std::scoped_lock lock(mtx);
+    orders.push_back(order);
+}
+
+
+void Modbus::ExecuteOrders()
+{
+    std::scoped_lock lock(mtx);
+    while (orders.size() > 0)
+    {
+        returnedValue = modbus_write_registers(mb, signals.at(order.first()).offset, DataTypeLength(signal.dataType), ConvertOrderToRegisters(signals.at(order.first()), orders.first().value));
+    }
+}
+
+
+uint16_t* ConvertOrderToRegisters(ModbusSignal& signal, ModbusValue orderValue)
+{
+    uint16_t* ptr = new uint16_t[DataTypeLength(signal.dataType)];
+
+
+    
+}
+
+

@@ -3,12 +3,13 @@
 #include <cstdint>
 #include <string>
 #include <vector>
-
-#include "log.hpp"
+#include <mutex>
 #include <iomanip>
 #include <bitset>
 #include <string>
 #include <sstream>
+
+#include "log.hpp"
 
 
 enum class ModbusRegion
@@ -80,6 +81,17 @@ public:
     ModbusSignal();
     ModbusSignal(Endian endian, ModbusDataType dataType, ModbusRegion region, int offset);
     ModbusSignal(ModbusDataType dataType, ModbusRegion region, int offset);
+};
+
+
+class ModbusOrder
+{
+    int signalNumber;
+    ModbusValue value;
+    
+    ModbusOrder();
+    ~ModbusOrder();
+    ModbusOrder(int newSignalNumber, ModbusValue newValue);
 };
 
 
