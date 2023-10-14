@@ -413,6 +413,7 @@ void Modbus::ExecuteOrders()
             }
             case ModbusRegion::HOLDING_REGISTERS:
             {
+                LOG_TRACE("writing {} registers from address {}", DataTypeLength(signal.dataType), signal.offset)
                 returnedValue = modbus_write_registers(mb, signal.offset, DataTypeLength(signal.dataType), TranslateValueToRegisters(signal, orders.front().value));
                 break;
             }
@@ -421,10 +422,7 @@ void Modbus::ExecuteOrders()
                 LOG_WARN("Order with invalid Modbus Region");
             }
         }
-        if (returnedValue != -1)
-        {
-            orders.erase(orders.begin());
-        }
+        orders.erase(orders.begin());
     }
 }
 
@@ -479,12 +477,12 @@ uint16_t* Modbus::TranslateValueToRegisters(ModbusSignal& signal, ModbusValue or
             uint32_t temp_uint32;
             if (signal.endian == Endian::BIG)
             {
-                temp_uint32 = SwapBytesInOrder<uint32_t>((uint16_t*)&orderValue.UINT_32, order32big);
+                temp_uint32 = SwapBytesInOrder<uint32_t>((uint16_t*)&orderValue.FLOAT, order32big);
                 *ptr = *((float*)&temp_uint32);   
             }
             else
             {
-                temp_uint32 = SwapBytesInOrder<uint32_t>((uint16_t*)&orderValue.UINT_32, order32little);
+                temp_uint32 = SwapBytesInOrder<uint32_t>((uint16_t*)&orderValue.FLOAT, order32little);
                 *ptr = *((float*)&temp_uint32);   
             }
             break;

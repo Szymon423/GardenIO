@@ -74,20 +74,20 @@ int main()
 
     for (int i = 0; i < 10; i++)
     {
-        mb.SetSignal(ModbusOrder(0, (uint16_t)(1000 * i)));
-        mb.SetSignal(ModbusOrder(1, (int16_t)(1000 * i)));
+        // mb.SetSignal(ModbusOrder(0, (uint16_t)(1000 * i)));
+        // mb.SetSignal(ModbusOrder(1, (int16_t)(1000 * i)));
         mb.SetSignal(ModbusOrder(2, (uint32_t)(1000 * i)));
-        mb.SetSignal(ModbusOrder(3, (uint32_t)(1000 * i)));
-        mb.SetSignal(ModbusOrder(4, (int32_t)(1000 * i)));
-        mb.SetSignal(ModbusOrder(5, (int32_t)(1000 * i)));
-        mb.SetSignal(ModbusOrder(6, (uint64_t)(1000 * i)));
-        mb.SetSignal(ModbusOrder(7, (uint64_t)(1000 * i)));
-        mb.SetSignal(ModbusOrder(8, (int64_t)(1000 * i)));
-        mb.SetSignal(ModbusOrder(9, (int64_t)(1000 * i)));
-        mb.SetSignal(ModbusOrder(10, (float)(1000 * i)));
-        mb.SetSignal(ModbusOrder(11, (float)(1000 * i)));
-        mb.SetSignal(ModbusOrder(12, (double)(1000 * i)));
-        mb.SetSignal(ModbusOrder(13, (double)(1000 * i)));
+        // mb.SetSignal(ModbusOrder(3, (uint32_t)(1000 * i)));
+        // mb.SetSignal(ModbusOrder(4, (int32_t)(1000 * i)));
+        // mb.SetSignal(ModbusOrder(5, (int32_t)(1000 * i)));
+        // mb.SetSignal(ModbusOrder(6, (uint64_t)(1000 * i)));
+        // mb.SetSignal(ModbusOrder(7, (uint64_t)(1000 * i)));
+        // mb.SetSignal(ModbusOrder(8, (int64_t)(1000 * i)));
+        // mb.SetSignal(ModbusOrder(9, (int64_t)(1000 * i)));
+        // mb.SetSignal(ModbusOrder(10, (float)(1000 * i)));
+        // mb.SetSignal(ModbusOrder(11, (float)(1000 * i)));
+        // mb.SetSignal(ModbusOrder(12, (double)(1000 * i)));
+        // mb.SetSignal(ModbusOrder(13, (double)(1000 * i)));
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
     }
