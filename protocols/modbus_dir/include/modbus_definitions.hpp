@@ -86,11 +86,22 @@ public:
 
 class ModbusOrder
 {
+public:
+
     int signalNumber;
     ModbusValue value;
     
     ModbusOrder();
     ~ModbusOrder();
+    ModbusOrder(int newSignalNumber, bool newValue);
+    ModbusOrder(int newSignalNumber, uint16_t newValue);
+    ModbusOrder(int newSignalNumber, int16_t newValue);
+    ModbusOrder(int newSignalNumber, uint32_t newValue);
+    ModbusOrder(int newSignalNumber, int32_t newValue);
+    ModbusOrder(int newSignalNumber, uint64_t newValue);
+    ModbusOrder(int newSignalNumber, int64_t newValue);
+    ModbusOrder(int newSignalNumber, float newValue);
+    ModbusOrder(int newSignalNumber, double newValue);
     ModbusOrder(int newSignalNumber, ModbusValue newValue);
 };
 

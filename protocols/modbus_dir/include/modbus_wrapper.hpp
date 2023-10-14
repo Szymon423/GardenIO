@@ -48,7 +48,7 @@ private:
     void TranslateRegistersToValue(uint16_t* ptr_registers, ModbusSignal* ptr_signal);
     void TranslateRegistersToValue(uint8_t* ptr_registers, ModbusSignal* ptr_signal);
     void ExecuteOrders();
-    uint16_t* ConvertOrderToRegisters(ModbusSignal& signal, ModbusValue orderValue);
+    uint16_t* TranslateValueToRegisters(ModbusSignal& signal, ModbusValue orderValue);
 
 
 public:

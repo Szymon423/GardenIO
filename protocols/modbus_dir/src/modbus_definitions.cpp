@@ -47,6 +47,70 @@ ModbusOrder::ModbusOrder()
 }
 
 
+ModbusOrder::ModbusOrder(int newSignalNumber, bool newValue)
+{
+    
+    signalNumber = newSignalNumber;
+    value.BOOL = newValue;
+}
+
+
+ModbusOrder::ModbusOrder(int newSignalNumber, uint16_t newValue)
+{
+    signalNumber = newSignalNumber;
+    value.UINT_16 = newValue;
+}
+
+
+ModbusOrder::ModbusOrder(int newSignalNumber, int16_t newValue)
+{
+    signalNumber = newSignalNumber;
+    value.INT_16 = newValue;
+}
+
+
+ModbusOrder::ModbusOrder(int newSignalNumber, uint32_t newValue)
+{
+    signalNumber = newSignalNumber;
+    value.UINT_32 = newValue;
+}
+
+
+ModbusOrder::ModbusOrder(int newSignalNumber, int32_t newValue)
+{
+    signalNumber = newSignalNumber;
+    value.INT_32 = newValue;
+}
+
+
+ModbusOrder::ModbusOrder(int newSignalNumber, uint64_t newValue)
+{
+    signalNumber = newSignalNumber;
+    value.UINT_64 = newValue;
+}
+
+
+ModbusOrder::ModbusOrder(int newSignalNumber, int64_t newValue)
+{
+    signalNumber = newSignalNumber;
+    value.INT_64 = newValue;
+}
+
+
+ModbusOrder::ModbusOrder(int newSignalNumber, float newValue)
+{
+    signalNumber = newSignalNumber;
+    value.FLOAT = newValue;
+}
+
+
+ModbusOrder::ModbusOrder(int newSignalNumber, double newValue)
+{
+    signalNumber = newSignalNumber;
+    value.DOUBLE = newValue;
+}
+
+
 ModbusOrder::ModbusOrder(int newSignalNumber, ModbusValue newValue)
     : signalNumber(newSignalNumber), value(newValue)
 {

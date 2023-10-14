@@ -67,11 +67,12 @@ void Modbus::RunInLoop()
     lastReadTime = time(NULL) - 2 * interval;
     time_t firstReadTime = lastReadTime;
     LOG_TRACE("Starting reading loop with interval: {}", interval);
-    while (keepReading && time(NULL) < firstReadTime + 15)
+    while (keepReading && time(NULL) < firstReadTime + 25)
     {
         if (time(NULL) > lastReadTime + interval)
         {
             LOG_TRACE("Reading cycle");
+            ExecuteOrders();
             ReadCoils();
             ReadInputs();
             ReadHoldingRegisters();
@@ -382,6 +383,16 @@ void Modbus::TranslateRegistersToValue(uint8_t* ptr_registers, ModbusSignal* ptr
 void Modbus::SetSignal(ModbusOrder order)
 {
     std::scoped_lock lock(mtx);
+    try 
+    {
+        // test cast to void to check if at() throws exception
+        (void)modbusSignals.at(order.signalNumber);
+    }
+    catch (...)
+    {
+        LOG_WARN("Trying to set value to signal which does not exist");
+        return;
+    }
     orders.push_back(order);
 }
 
@@ -389,19 +400,140 @@ void Modbus::SetSignal(ModbusOrder order)
 void Modbus::ExecuteOrders()
 {
     std::scoped_lock lock(mtx);
+    LOG_TRACE("Executing {} orders", orders.size());
     while (orders.size() > 0)
     {
-        returnedValue = modbus_write_registers(mb, signals.at(order.first()).offset, DataTypeLength(signal.dataType), ConvertOrderToRegisters(signals.at(order.first()), orders.first().value));
+        ModbusSignal& signal = modbusSignals.at(orders.front().signalNumber);
+        switch (signal.region)
+        {
+            case ModbusRegion::COILS:
+            {
+                returnedValue = modbus_write_bit(mb, signal.offset, static_cast<int>(orders.front().value.BOOL));
+                break;
+            }
+            case ModbusRegion::HOLDING_REGISTERS:
+            {
+                returnedValue = modbus_write_registers(mb, signal.offset, DataTypeLength(signal.dataType), TranslateValueToRegisters(signal, orders.front().value));
+                break;
+            }
+            default:
+            {
+                LOG_WARN("Order with invalid Modbus Region");
+            }
+        }
+        if (returnedValue != -1)
+        {
+            orders.erase(orders.begin());
+        }
     }
 }
 
 
-uint16_t* ConvertOrderToRegisters(ModbusSignal& signal, ModbusValue orderValue)
+uint16_t* Modbus::TranslateValueToRegisters(ModbusSignal& signal, ModbusValue orderValue)
 {
+    std::vector<int> order32big = { 2, 3, 0, 1 };
+    std::vector<int> order32little = { 1, 0, 3, 2 };
+    std::vector<int> order64big = { 6, 7, 4, 5, 2, 3, 0, 1 };
+    std::vector<int> order64little = { 1, 0, 3, 2, 5, 4, 7, 6 };
+
     uint16_t* ptr = new uint16_t[DataTypeLength(signal.dataType)];
 
-
-    
+    switch (signal.dataType)
+    {
+        case ModbusDataType::UINT_16:
+        {
+            *ptr = orderValue.UINT_16;
+            break;
+        }
+        case ModbusDataType::INT_16:
+        {
+            *ptr = orderValue.INT_16;
+            break;
+        }
+        case ModbusDataType::UINT_32:
+        {
+            if (signal.endian == Endian::BIG)
+            {
+                *ptr = SwapBytesInOrder<uint32_t>((uint16_t*)&orderValue.UINT_32, order32big);
+            }
+            else
+            {
+                *ptr = SwapBytesInOrder<uint32_t>((uint16_t*)&orderValue.UINT_32, order32little);
+            }
+            break;
+        }
+        case ModbusDataType::INT_32:
+        {
+            if (signal.endian == Endian::BIG)
+            {
+                *ptr = SwapBytesInOrder<int32_t>((uint16_t*)&orderValue.INT_32, order32big);
+            }
+            else
+            {
+                *ptr = SwapBytesInOrder<int32_t>((uint16_t*)&orderValue.INT_32, order32little);
+            }
+            break;
+        }
+        case ModbusDataType::FLOAT:
+        {
+            uint32_t temp_uint32;
+            if (signal.endian == Endian::BIG)
+            {
+                temp_uint32 = SwapBytesInOrder<uint32_t>((uint16_t*)&orderValue.UINT_32, order32big);
+                *ptr = *((float*)&temp_uint32);   
+            }
+            else
+            {
+                temp_uint32 = SwapBytesInOrder<uint32_t>((uint16_t*)&orderValue.UINT_32, order32little);
+                *ptr = *((float*)&temp_uint32);   
+            }
+            break;
+        }
+        case ModbusDataType::UINT_64:
+        {
+            if (signal.endian == Endian::BIG)
+            {
+                *ptr = SwapBytesInOrder<uint64_t>((uint16_t*)&orderValue.UINT_64, order64big);
+            }
+            else
+            {
+                *ptr = SwapBytesInOrder<uint64_t>((uint16_t*)&orderValue.UINT_64, order64little);
+            }
+            break;
+        }
+        case ModbusDataType::INT_64:
+        {
+            if (signal.endian == Endian::BIG)
+            {
+                *ptr = SwapBytesInOrder<int64_t>((uint16_t*)&orderValue.INT_64, order64big);
+            }
+            else
+            {
+                *ptr = SwapBytesInOrder<int64_t>((uint16_t*)&orderValue.INT_64, order64little);
+            }
+            break;
+        }
+        case ModbusDataType::DOUBLE:
+        {
+            uint64_t temp_uint64;
+            if (signal.endian == Endian::BIG)
+            {
+                temp_uint64 = SwapBytesInOrder<uint64_t>((uint16_t*)&orderValue.DOUBLE, order64big);
+                *ptr = *((double*)&temp_uint64);   
+            }
+            else
+            {
+                temp_uint64 = SwapBytesInOrder<uint64_t>((uint16_t*)&orderValue.DOUBLE, order64little);
+                *ptr = *((double*)&temp_uint64);  
+            }
+            break;
+        }
+        default:
+        {
+            break;
+        }
+    }
+    return ptr;
 }
 
 
