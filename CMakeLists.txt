@@ -17,7 +17,7 @@ add_subdirectory(external/spdlog)
 add_executable(GardenIO main.cpp)
 
 find_package(spdlog)
-# find_package (SQLite3)
+find_package(nlohmann_json 3.2.0 REQUIRED)
 
 
 target_link_libraries(GardenIO LINK_PUBLIC sqlite3)

@@ -1,4 +1,9 @@
-add_library(common src/shared_memory.cpp src/signals_definitions.cpp src/common_functions.cpp src/log_manager.cpp)
+add_library(common src/shared_memory.cpp 
+                   src/signals_definitions.cpp 
+                   src/common_functions.cpp 
+                   src/log_manager.cpp
+                   src/configuration.cpp
+                   src/configuration_parser.cpp)
 
 target_include_directories(common PUBLIC include)
 
