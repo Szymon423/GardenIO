@@ -436,6 +436,7 @@ uint16_t* Modbus::TranslateValueToRegisters(ModbusSignal& signal, ModbusValue or
 
     uint16_t* ptr = new uint16_t[DataTypeLength(signal.dataType)];
 
+
     switch (signal.dataType)
     {
         case ModbusDataType::UINT_16:
@@ -450,26 +451,30 @@ uint16_t* Modbus::TranslateValueToRegisters(ModbusSignal& signal, ModbusValue or
         }
         case ModbusDataType::UINT_32:
         {
+            uint32_t value; 
             if (signal.endian == Endian::BIG)
             {
-                *ptr = SwapBytesInOrder<uint32_t>((uint16_t*)&orderValue.UINT_32, order32big);
+                value = SwapBytesInOrder<uint32_t>((uint16_t*)&orderValue.UINT_32, order32big);
             }
             else
             {
-                *ptr = SwapBytesInOrder<uint32_t>((uint16_t*)&orderValue.UINT_32, order32little);
+                value = SwapBytesInOrder<uint32_t>((uint16_t*)&orderValue.UINT_32, order32little);
             }
+            std::memcpy(ptr, &value, 4);
             break;
         }
         case ModbusDataType::INT_32:
         {
+            int32_t value;
             if (signal.endian == Endian::BIG)
             {
-                *ptr = SwapBytesInOrder<int32_t>((uint16_t*)&orderValue.INT_32, order32big);
+                value = SwapBytesInOrder<int32_t>((uint16_t*)&orderValue.INT_32, order32big);
             }
             else
             {
-                *ptr = SwapBytesInOrder<int32_t>((uint16_t*)&orderValue.INT_32, order32little);
+                value = SwapBytesInOrder<int32_t>((uint16_t*)&orderValue.INT_32, order32little);
             }
+            std::memcpy(ptr, &value, 4);
             break;
         }
         case ModbusDataType::FLOAT:
@@ -478,37 +483,40 @@ uint16_t* Modbus::TranslateValueToRegisters(ModbusSignal& signal, ModbusValue or
             if (signal.endian == Endian::BIG)
             {
                 temp_uint32 = SwapBytesInOrder<uint32_t>((uint16_t*)&orderValue.FLOAT, order32big);
-                *ptr = *((float*)&temp_uint32);   
             }
             else
             {
                 temp_uint32 = SwapBytesInOrder<uint32_t>((uint16_t*)&orderValue.FLOAT, order32little);
-                *ptr = *((float*)&temp_uint32);   
             }
+            std::memcpy(ptr, &temp_uint32, 4);
             break;
         }
         case ModbusDataType::UINT_64:
         {
+            uint64_t value; 
             if (signal.endian == Endian::BIG)
             {
-                *ptr = SwapBytesInOrder<uint64_t>((uint16_t*)&orderValue.UINT_64, order64big);
+                value = SwapBytesInOrder<uint64_t>((uint16_t*)&orderValue.UINT_64, order64big);
             }
             else
             {
-                *ptr = SwapBytesInOrder<uint64_t>((uint16_t*)&orderValue.UINT_64, order64little);
+                value = SwapBytesInOrder<uint64_t>((uint16_t*)&orderValue.UINT_64, order64little);
             }
+            std::memcpy(ptr, &value, 8);
             break;
         }
         case ModbusDataType::INT_64:
         {
+            int64_t value;
             if (signal.endian == Endian::BIG)
             {
-                *ptr = SwapBytesInOrder<int64_t>((uint16_t*)&orderValue.INT_64, order64big);
+                value = SwapBytesInOrder<int64_t>((uint16_t*)&orderValue.INT_64, order64big);
             }
             else
             {
-                *ptr = SwapBytesInOrder<int64_t>((uint16_t*)&orderValue.INT_64, order64little);
+                value = SwapBytesInOrder<int64_t>((uint16_t*)&orderValue.INT_64, order64little);
             }
+            std::memcpy(ptr, &value, 8);
             break;
         }
         case ModbusDataType::DOUBLE:
@@ -517,13 +525,12 @@ uint16_t* Modbus::TranslateValueToRegisters(ModbusSignal& signal, ModbusValue or
             if (signal.endian == Endian::BIG)
             {
                 temp_uint64 = SwapBytesInOrder<uint64_t>((uint16_t*)&orderValue.DOUBLE, order64big);
-                *ptr = *((double*)&temp_uint64);   
             }
             else
             {
                 temp_uint64 = SwapBytesInOrder<uint64_t>((uint16_t*)&orderValue.DOUBLE, order64little);
-                *ptr = *((double*)&temp_uint64);  
             }
+            std::memcpy(ptr, &temp_uint64, 8);
             break;
         }
         default:
