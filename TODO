@@ -2,12 +2,12 @@
 - [x] Put MQTT into Protocols Directory
 - [x] Run wind ReadLoop on thread
 - [x] Change sqlite_wrapper to use std::string in constructor
+- [x] Add libmodbus to the project as another communication protocol
+
 - [ ] Make wind readings as analog signals and parse them to DB
 - [ ] Implement analog/binary signals parser for mqtt payload
-- [ ] Add libmodbus to the project as another communication protocol
 - [ ] Implement archivisor class so it can do backups every <X> hours/days/...
 - [ ] Implement raporting mechanism - not sure if it's okay to put it here or maybe better place is web interface
-
 
 <!-- explicit version -->
 <msg>                           <!-- analog signal message -->
