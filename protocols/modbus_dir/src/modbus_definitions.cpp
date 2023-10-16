@@ -204,3 +204,36 @@ std::string ModbusSignalInfo(ModbusSignal signal)
     info += "offset: " + std::to_string(signal.offset);
     return info;
 }
+
+
+ModbusRegion StringToModbusRegion(std::string region)
+{
+    if (region == "COILS") return ModbusRegion::COILS;
+    if (region == "INPUTS") return ModbusRegion::INPUTS;
+    if (region == "HOLDING_REGISTERS") return ModbusRegion::HOLDING_REGISTERS;
+    if (region == "INPUT_REGISTERS") return ModbusRegion::INPUT_REGISTERS;
+    return ModbusRegion::UNKNOWN;
+}
+
+
+ModbusDataType StringToModbusDataType(std::string dataType)
+{
+    if (dataType == "BOOL") return ModbusDataType::BOOL;
+    if (dataType == "UINT_16") return ModbusDataType::UINT_16;
+    if (dataType == "INT_16") return ModbusDataType::INT_16;
+    if (dataType == "UINT_32") return ModbusDataType::UINT_32;
+    if (dataType == "INT_32") return ModbusDataType::INT_32;
+    if (dataType == "UINT_64") return ModbusDataType::UINT_64;
+    if (dataType == "INT_64") return ModbusDataType::INT_64;
+    if (dataType == "FLOAT") return ModbusDataType::FLOAT;
+    if (dataType == "DOUBLE") return ModbusDataType::DOUBLE;
+    return ModbusDataType::UNKNOWN;
+}
+
+
+Endian StringToEndian(std::string endian)
+{
+    if (endian == "BIG") return Endian::BIG;
+    if (endian == "LITTLE") return Endian::LITTLE;
+    return Endian::NONE;
+}

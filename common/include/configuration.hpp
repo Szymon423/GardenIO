@@ -1,6 +1,7 @@
 #include <string>
+#include <nlohmann/json.hpp>
 
-#include "modbus_definitions.hpp"
+#include "device.hpp"
 
 /*///////////////////////////////////////
 
@@ -12,12 +13,13 @@ GardenIO/configuration/...
 class Configuration
 {
 private:
-    const std::string devicesPath = "configuration/devices.json";
-    
+    const std::string devicesPath{"configuration/genericDevices.json"};
+    std::vector<Device> devices;
     void CheckConfigFileExist();
+    void ReadConfigFile();
 public:
     Configuration();
+
     ~Configuration();
     void LoadConfiguration();
-    void ReloadConfiguration();
 };

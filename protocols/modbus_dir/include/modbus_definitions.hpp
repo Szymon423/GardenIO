@@ -17,7 +17,8 @@ enum class ModbusRegion
     COILS,
     INPUTS,
     HOLDING_REGISTERS,
-    INPUT_REGISTERS
+    INPUT_REGISTERS,
+    UNKNOWN
 };
 
 
@@ -39,7 +40,8 @@ enum class ModbusDataType
     UINT_64,
     INT_64,
     FLOAT,
-    DOUBLE
+    DOUBLE,
+    UNKNOWN
 };
 
 
@@ -112,6 +114,10 @@ std::string ModbusRegionToString(ModbusRegion region);
 std::string ModbusDataTypeToString(ModbusDataType dataType);
 std::string EndianToString(Endian endian);
 std::string ModbusSignalInfo(ModbusSignal signal);
+
+ModbusRegion StringToModbusRegion(std::string region);
+ModbusDataType StringToModbusDataType(std::string dataType);
+Endian StringToEndian(std::string endian);
 
 template <typename T>
 T SwapBytesInOrder(uint16_t* oryginal, std::vector<int>& order)

@@ -1,0 +1,157 @@
+{
+    "genericDevices":
+    [
+        {
+            "DeviceType" : "NODE_1",
+            "IP" : "127.0.0.1",
+            "ModbusEnabled" : true,
+            "ModbusPort" : 502,
+            "ModbusSignals" :
+            [
+                {
+                    "offset" : 0,
+                    "ModbusDataType" : "BOOL",
+                    "Endian" : "NONE",
+                    "ModbusRegion" : "COILS"
+                },
+                {
+                    "offset" : 1,
+                    "ModbusDataType" : "BOOL",
+                    "Endian" : "NONE",
+                    "ModbusRegion" : "COILS"
+                },
+                {
+                    "offset" : 0,
+                    "ModbusDataType" : "BOOL",
+                    "Endian" : "NONE",
+                    "ModbusRegion" : "INPUTS"
+                },
+                {
+                    "offset" : 1,
+                    "ModbusDataType" : "BOOL",
+                    "Endian" : "NONE",
+                    "ModbusRegion" : "INPUTS"
+                },
+                {
+                    "offset" : 0,
+                    "ModbusDataType" : "DOUBLE",
+                    "Endian" : "LITTLE",
+                    "ModbusRegion" : "INPUT_REGISTERS"
+                },
+                {
+                    "offset" : 4,
+                    "ModbusDataType" : "DOUBLE",
+                    "Endian" : "LITTLE",
+                    "ModbusRegion" : "INPUT_REGISTERS"
+                }
+            ]
+
+            
+        },
+        {
+            "DeviceType" : "NODE_2",
+            "IP" : "127.0.0.1",
+            "ModbusEnabled" : true,
+            "ModbusPort" : 502,
+            "ModbusSignals" :
+            [
+                {
+                    "offset" : 0,
+                    "ModbusDataType" : "BOOL",
+                    "Endian" : "NONE",
+                    "ModbusRegion" : "COILS"
+                },
+                {
+                    "offset" : 1,
+                    "ModbusDataType" : "BOOL",
+                    "Endian" : "NONE",
+                    "ModbusRegion" : "COILS"
+                },
+                {
+                    "offset" : 2,
+                    "ModbusDataType" : "BOOL",
+                    "Endian" : "NONE",
+                    "ModbusRegion" : "COILS"
+                },
+                {
+                    "offset" : 3,
+                    "ModbusDataType" : "BOOL",
+                    "Endian" : "NONE",
+                    "ModbusRegion" : "COILS"
+                },
+                {
+                    "offset" : 4,
+                    "ModbusDataType" : "BOOL",
+                    "Endian" : "NONE",
+                    "ModbusRegion" : "COILS"
+                },
+                {
+                    "offset" : 5,
+                    "ModbusDataType" : "BOOL",
+                    "Endian" : "NONE",
+                    "ModbusRegion" : "COILS"
+                },
+                {
+                    "offset" : 6,
+                    "ModbusDataType" : "BOOL",
+                    "Endian" : "NONE",
+                    "ModbusRegion" : "COILS"
+                },
+                {
+                    "offset" : 7,
+                    "ModbusDataType" : "BOOL",
+                    "Endian" : "NONE",
+                    "ModbusRegion" : "COILS"
+                },
+                {
+                    "offset" : 0,
+                    "ModbusDataType" : "BOOL",
+                    "Endian" : "NONE",
+                    "ModbusRegion" : "INPUTS"
+                },
+                {
+                    "offset" : 1,
+                    "ModbusDataType" : "BOOL",
+                    "Endian" : "NONE",
+                    "ModbusRegion" : "INPUTS"
+                },
+                {
+                    "offset" : 2,
+                    "ModbusDataType" : "BOOL",
+                    "Endian" : "NONE",
+                    "ModbusRegion" : "INPUTS"
+                },
+                {
+                    "offset" : 3,
+                    "ModbusDataType" : "BOOL",
+                    "Endian" : "NONE",
+                    "ModbusRegion" : "INPUTS"
+                },
+                {
+                    "offset" : 4,
+                    "ModbusDataType" : "BOOL",
+                    "Endian" : "NONE",
+                    "ModbusRegion" : "INPUTS"
+                },
+                {
+                    "offset" : 5,
+                    "ModbusDataType" : "BOOL",
+                    "Endian" : "NONE",
+                    "ModbusRegion" : "INPUTS"
+                },
+                {
+                    "offset" : 6,
+                    "ModbusDataType" : "BOOL",
+                    "Endian" : "NONE",
+                    "ModbusRegion" : "INPUTS"
+                },
+                {
+                    "offset" : 7,
+                    "ModbusDataType" : "BOOL",
+                    "Endian" : "NONE",
+                    "ModbusRegion" : "INPUTS"
+                }
+            ]
+        }
+    ]
+}

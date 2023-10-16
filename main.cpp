@@ -12,20 +12,24 @@
 #include "log.hpp"
 #include "mqtt_client.hpp"
 #include "wind_sensor.hpp"
+#include "configuration.hpp"
 
 int main()
 {
     logger::manager LOG;
     LOG.Initialize("./GardenIO.log");
-    
-    sqlite_wrapper db("./database/test.db");
-    int ret = db.create_tables();
 
-    Modbus mb;
-    mb.SetConnectionParams("192.168.0.172", 502);
-    mb.SetConnectionInterval(1);
+    Configuration config;
+    config.LoadConfiguration();
     
-    std::vector<ModbusSignal> vect;
+    // sqlite_wrapper db("./database/test.db");
+    // int ret = db.create_tables();
+
+    // Modbus mb;
+    // mb.SetConnectionParams("192.168.0.172", 502);
+    // mb.SetConnectionInterval(1);
+    
+    // std::vector<ModbusSignal> vect;
     // vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::UINT_16, ModbusRegion::INPUT_REGISTERS, 0));
     // vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::INT_16, ModbusRegion::INPUT_REGISTERS, 1));
     // vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::UINT_32, ModbusRegion::INPUT_REGISTERS, 2));
@@ -41,20 +45,20 @@ int main()
     // vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::DOUBLE, ModbusRegion::INPUT_REGISTERS, 30));
     // vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::DOUBLE, ModbusRegion::INPUT_REGISTERS, 34));
 
-    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::UINT_16, ModbusRegion::HOLDING_REGISTERS, 0));
-    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::INT_16, ModbusRegion::HOLDING_REGISTERS, 1));
-    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::UINT_32, ModbusRegion::HOLDING_REGISTERS, 2));
-    vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::UINT_32, ModbusRegion::HOLDING_REGISTERS, 4));
-    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::INT_32, ModbusRegion::HOLDING_REGISTERS, 6));
-    vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::INT_32, ModbusRegion::HOLDING_REGISTERS, 8));
-    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::UINT_64, ModbusRegion::HOLDING_REGISTERS, 10));
-    vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::UINT_64, ModbusRegion::HOLDING_REGISTERS, 14));
-    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::INT_64, ModbusRegion::HOLDING_REGISTERS, 18));
-    vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::INT_64, ModbusRegion::HOLDING_REGISTERS, 22));
-    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::FLOAT, ModbusRegion::HOLDING_REGISTERS, 26));
-    vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::FLOAT, ModbusRegion::HOLDING_REGISTERS, 28));
-    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::DOUBLE, ModbusRegion::HOLDING_REGISTERS, 30));
-    vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::DOUBLE, ModbusRegion::HOLDING_REGISTERS, 34));
+    // vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::UINT_16, ModbusRegion::HOLDING_REGISTERS, 0));
+    // vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::INT_16, ModbusRegion::HOLDING_REGISTERS, 1));
+    // vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::UINT_32, ModbusRegion::HOLDING_REGISTERS, 2));
+    // vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::UINT_32, ModbusRegion::HOLDING_REGISTERS, 4));
+    // vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::INT_32, ModbusRegion::HOLDING_REGISTERS, 6));
+    // vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::INT_32, ModbusRegion::HOLDING_REGISTERS, 8));
+    // vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::UINT_64, ModbusRegion::HOLDING_REGISTERS, 10));
+    // vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::UINT_64, ModbusRegion::HOLDING_REGISTERS, 14));
+    // vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::INT_64, ModbusRegion::HOLDING_REGISTERS, 18));
+    // vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::INT_64, ModbusRegion::HOLDING_REGISTERS, 22));
+    // vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::FLOAT, ModbusRegion::HOLDING_REGISTERS, 26));
+    // vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::FLOAT, ModbusRegion::HOLDING_REGISTERS, 28));
+    // vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::DOUBLE, ModbusRegion::HOLDING_REGISTERS, 30));
+    // vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::DOUBLE, ModbusRegion::HOLDING_REGISTERS, 34));
     
     // vect.push_back(ModbusSignal(ModbusDataType::BOOL, ModbusRegion::INPUTS, 0));
     // vect.push_back(ModbusSignal(ModbusDataType::BOOL, ModbusRegion::INPUTS, 1));
@@ -68,31 +72,31 @@ int main()
     // vect.push_back(ModbusSignal(ModbusDataType::BOOL, ModbusRegion::COILS, 3));
     // vect.push_back(ModbusSignal(ModbusDataType::BOOL, ModbusRegion::COILS, 4));
 
-    mb.SetSignalsDefinitions(vect);
+    // mb.SetSignalsDefinitions(vect);
     
-    std::thread modbus_thread(&Modbus::RunInLoop, &mb);
+    // std::thread modbus_thread(&Modbus::RunInLoop, &mb);
 
-    for (int i = 0; i < 10; i++)
-    {
-        mb.SetSignal(ModbusOrder(0, (uint16_t)(1000 * i)));
-        mb.SetSignal(ModbusOrder(1, (int16_t)(1000 * i)));
-        mb.SetSignal(ModbusOrder(2, (uint32_t)(1000 * i)));
-        mb.SetSignal(ModbusOrder(3, (uint32_t)(1000 * i)));
-        mb.SetSignal(ModbusOrder(4, (int32_t)(1000 * i)));
-        mb.SetSignal(ModbusOrder(5, (int32_t)(1000 * i)));
-        mb.SetSignal(ModbusOrder(6, (uint64_t)(1000 * i)));
-        mb.SetSignal(ModbusOrder(7, (uint64_t)(1000 * i)));
-        mb.SetSignal(ModbusOrder(8, (int64_t)(1000 * i)));
-        mb.SetSignal(ModbusOrder(9, (int64_t)(1000 * i)));
-        mb.SetSignal(ModbusOrder(10, (float)(1000 * i)));
-        mb.SetSignal(ModbusOrder(11, (float)(1000 * i)));
-        mb.SetSignal(ModbusOrder(12, (double)(1000 * i)));
-        mb.SetSignal(ModbusOrder(13, (double)(1000 * i)));
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    // for (int i = 0; i < 10; i++)
+    // {
+    //     mb.SetSignal(ModbusOrder(0, (uint16_t)(1000 * i)));
+    //     mb.SetSignal(ModbusOrder(1, (int16_t)(1000 * i)));
+    //     mb.SetSignal(ModbusOrder(2, (uint32_t)(1000 * i)));
+    //     mb.SetSignal(ModbusOrder(3, (uint32_t)(1000 * i)));
+    //     mb.SetSignal(ModbusOrder(4, (int32_t)(1000 * i)));
+    //     mb.SetSignal(ModbusOrder(5, (int32_t)(1000 * i)));
+    //     mb.SetSignal(ModbusOrder(6, (uint64_t)(1000 * i)));
+    //     mb.SetSignal(ModbusOrder(7, (uint64_t)(1000 * i)));
+    //     mb.SetSignal(ModbusOrder(8, (int64_t)(1000 * i)));
+    //     mb.SetSignal(ModbusOrder(9, (int64_t)(1000 * i)));
+    //     mb.SetSignal(ModbusOrder(10, (float)(1000 * i)));
+    //     mb.SetSignal(ModbusOrder(11, (float)(1000 * i)));
+    //     mb.SetSignal(ModbusOrder(12, (double)(1000 * i)));
+    //     mb.SetSignal(ModbusOrder(13, (double)(1000 * i)));
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-    }
+    // }
 
-    modbus_thread.join();
+    // modbus_thread.join();
 
     // WindSensor ws("/dev/ttyUSB0", &db);  
     // std::thread wsThread(&WindSensor::ReadLoop, &ws, -1);

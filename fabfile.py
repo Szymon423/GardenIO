@@ -21,6 +21,8 @@ def Install(ctx):
     with Connection(host=ctx.host, user=user, port=port, connect_kwargs={'password': password}) as c:
         c.run("mkdir -p " + GardenIO_target_path)
         c.run("mkdir -p " + GardenIO_target_path + r"/database")
+        c.run("mkdir -p " + GardenIO_target_path + r"/configuration")
+        c.put("genericDevices.json", GardenIO_target_path + "/configuration/genericDevices.json")
         c.put(GardenIO_source_path, GardenIO_target_path)
         c.run(GardenIO_target_path + r"/GardenIO")
 

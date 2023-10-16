@@ -18,10 +18,14 @@ private:
     std::string IP;
     bool ModbusEnabled;
     int ModbusPort;
-    std::vector<ModbusSignal> modbusSignals;
+    std::vector<ModbusSignal> ModbusSignals;
 
 public:
     ~Device();
     Device();
     Device(DeviceType dt, std::string ip);
+    Device(DeviceType dt, std::string ip, bool modbusEnabled, int port, std::vector<ModbusSignal> signals);
 };
+
+
+DeviceType StringToDeviceType(std::string deviceType);
