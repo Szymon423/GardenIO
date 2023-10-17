@@ -2,12 +2,12 @@ from fabric import task
 from fabric import Connection
 import os
 
-# user = "szymon"
-user = r"pi"
-compile = r"Release"
+user = "szymon"
+# user = r"pi"
+# compile = r"Release"
 compile = r"Debug"
-# password = r"2ndRPI@"
-password = r"1stRPI@"
+password = r"2ndRPI@"
+# password = r"1stRPI@"
 port = 22
 
 GardenIO_source_path = r"build/" + compile + r"/GardenIO"
@@ -34,5 +34,6 @@ def InstallPrerequisites(ctx):
         c.sudo("apt install -y mosquitto mosquitto-clients")
         c.sudo("apt install -y libspdlog-dev")
         c.sudo("apt install -y libmodbus-dev")
+        c.sudo("apt install -y nlohmann-json3-dev")
         c.sudo("adduser $USER dialout")
 

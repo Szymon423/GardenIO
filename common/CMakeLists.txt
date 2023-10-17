@@ -3,7 +3,7 @@ add_library(common src/shared_memory.cpp
                    src/common_functions.cpp 
                    src/log_manager.cpp
                    src/configuration.cpp
-                   src/configuration_parser.cpp)
+                   src/device.cpp)
 
 target_include_directories(common PUBLIC include)
 

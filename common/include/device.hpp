@@ -25,7 +25,9 @@ public:
     Device();
     Device(DeviceType dt, std::string ip);
     Device(DeviceType dt, std::string ip, bool modbusEnabled, int port, std::vector<ModbusSignal> signals);
+    std::string PrintDeviceInfo();
 };
 
 
 DeviceType StringToDeviceType(std::string deviceType);
+std::string DeviceTypeToString(DeviceType deviceType);

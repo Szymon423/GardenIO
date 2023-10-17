@@ -10,7 +10,7 @@
 
 Configuration::Configuration()
 {
-
+    CheckConfigFileExist();
 }
 
 
@@ -22,13 +22,15 @@ Configuration::~Configuration()
 
 void Configuration::CheckConfigFileExist()
 {
-    if (std::filesystem::exists(devicesPath.c_str()))
+    namespace fs = std::filesystem;
+    fs::path p = fs::current_path() / devicesPath;
+    if (fs::exists(p))
     {
-        LOG_TRACE("Config file: ./GardenIO/configuration/devices.json exist");
+        LOG_TRACE("Config file: {} exist", std::string(p.u8string()));
     }
     else
     {
-        LOG_WARN("File: ./GardenIO/configuration/devices.json not found");
+        LOG_WARN("File: {} not found", std::string(p.u8string()));
     }
 }
 
@@ -62,13 +64,14 @@ void Configuration::ReadConfigFile()
 void Configuration::LoadConfiguration()
 {
     devices.clear();
-    ReadConfigFile()
+    ReadConfigFile();
 }
 
 
-DeviceType StringToDeviceType(std::string deviceType)
+void Configuration::Print()
 {
-    if (deviceType == "NODE_1") return DeviceType::NODE_1;
-    if (deviceType == "NODE_2") return DeviceType::NODE_2;
-    return DeviceType::NON_GENERIC;
+    for (auto& dev : devices)
+    {
+        std::cout << dev.PrintDeviceInfo() << std::endl;
+    }
 }

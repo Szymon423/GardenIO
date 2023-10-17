@@ -13,7 +13,7 @@ GardenIO/configuration/...
 class Configuration
 {
 private:
-    const std::string devicesPath{"configuration/genericDevices.json"};
+    const std::string devicesPath{"GardenIO/configuration/genericDevices.json"};
     std::vector<Device> devices;
     void CheckConfigFileExist();
     void ReadConfigFile();
@@ -22,4 +22,5 @@ public:
 
     ~Configuration();
     void LoadConfiguration();
+    void Print();
 };

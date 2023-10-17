@@ -13,11 +13,12 @@ add_subdirectory(common)
 add_subdirectory(database)
 add_subdirectory(protocols)
 add_subdirectory(external/spdlog)
+add_subdirectory(external/json)
 
 add_executable(GardenIO main.cpp)
 
 find_package(spdlog)
-find_package(nlohmann_json 3.2.0 REQUIRED)
+find_package(nlohmann_json)
 
 
 target_link_libraries(GardenIO LINK_PUBLIC sqlite3)
@@ -30,3 +31,4 @@ target_link_libraries(GardenIO PUBLIC mqtt)
 target_link_libraries(GardenIO PUBLIC modbusLib)
 target_link_libraries(GardenIO PUBLIC serial)
 target_link_libraries(GardenIO PUBLIC wind)
+target_link_libraries(GardenIO PUBLIC stdc++fs)

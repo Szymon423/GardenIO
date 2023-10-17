@@ -21,6 +21,7 @@ int main()
 
     Configuration config;
     config.LoadConfiguration();
+    config.Print();
     
     // sqlite_wrapper db("./database/test.db");
     // int ret = db.create_tables();
