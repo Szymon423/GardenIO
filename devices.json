@@ -1,0 +1,47 @@
+{
+    "devices":
+    [
+        {
+            "DeviceType" : "NODE_1",
+            "IP" : "127.0.0.1",
+            "DeviceName" : "czujnik 1"
+        },
+        {
+            "DeviceType" : "NODE_1",
+            "IP" : "127.0.0.1",
+            "DeviceName" : "czujnik 2"
+        },
+        {
+            "DeviceType" : "NODE_2",
+            "IP" : "127.0.0.1",
+            "DeviceName" : "czujnik 3"
+        },
+        {
+            "DeviceType" : "NODE_2",
+            "IP" : "127.0.0.1",
+            "DeviceName" : "czujnik 4"
+        },
+        {
+            "DeviceType" : "-",
+            "IP" : "127.0.0.1",
+            "DeviceName" : "test-non-generic-modbus-device",
+            "ModbusEnabled" : true,
+            "ModbusPort" : 502,
+            "ModbusSignals" :
+            [
+                {
+                    "offset" : 0,
+                    "ModbusDataType" : "DOUBLE",
+                    "Endian" : "LITTLE",
+                    "ModbusRegion" : "INPUT_REGISTERS"
+                },
+                {
+                    "offset" : 4,
+                    "ModbusDataType" : "DOUBLE",
+                    "Endian" : "LITTLE",
+                    "ModbusRegion" : "INPUT_REGISTERS"
+                }
+            ]
+        }
+    ]
+}

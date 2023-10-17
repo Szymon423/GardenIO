@@ -1,4 +1,5 @@
 #include <string>
+#include <map>
 #include <nlohmann/json.hpp>
 
 #include "device.hpp"
@@ -13,13 +14,18 @@ GardenIO/configuration/...
 class Configuration
 {
 private:
-    const std::string devicesPath{"GardenIO/configuration/genericDevices.json"};
+    const std::string genericDevicesPath{"GardenIO/configuration/genericDevices.json"};
+    const std::string devicesPath{"GardenIO/configuration/devices.json"};
     std::vector<Device> devices;
-    void CheckConfigFileExist();
+    std::vector<Device> genericDevices;
+    std::map<DeviceType, int> map;
+    void CheckFileExist(const std::string& path);
+    void ReadGenericConfigFile();
     void ReadConfigFile();
+    void LoadGenericConfiguration();
+    
 public:
     Configuration();
-
     ~Configuration();
     void LoadConfiguration();
     void Print();

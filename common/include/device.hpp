@@ -16,6 +16,7 @@ class Device
 private:
     DeviceType deviceType;
     std::string IP;
+    std::string deviceName;
     bool ModbusEnabled;
     int ModbusPort;
     std::vector<ModbusSignal> ModbusSignals;
@@ -23,8 +24,11 @@ private:
 public:
     ~Device();
     Device();
-    Device(DeviceType dt, std::string ip);
-    Device(DeviceType dt, std::string ip, bool modbusEnabled, int port, std::vector<ModbusSignal> signals);
+    Device(DeviceType dt, const std::string& ip);
+    Device(DeviceType dt, const std::string& ip, bool modbusEnabled, int port, const std::vector<ModbusSignal>& signals);
+    Device(DeviceType dt, const std::string& ip, const std::string& name, bool modbusEnabled, int port, const std::vector<ModbusSignal>& signals);
+    Device(const Device& dev, const std::string& ip, const std::string& name);
+    std::vector<ModbusSignal> GetModbusSignals();
     std::string PrintDeviceInfo();
 };
 

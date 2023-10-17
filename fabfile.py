@@ -23,6 +23,7 @@ def Install(ctx):
         c.run("mkdir -p " + GardenIO_target_path + r"/database")
         c.run("mkdir -p " + GardenIO_target_path + r"/configuration")
         c.put("genericDevices.json", GardenIO_target_path + "/configuration/genericDevices.json")
+        c.put("devices.json", GardenIO_target_path + "/configuration/devices.json")
         c.put(GardenIO_source_path, GardenIO_target_path)
         c.run(GardenIO_target_path + r"/GardenIO")
 
