@@ -1,5 +1,7 @@
 #include <string>
 #include <map>
+#include <vector>
+
 #include <nlohmann/json.hpp>
 
 #include "device.hpp"
@@ -7,7 +9,7 @@
 /*///////////////////////////////////////
 
 GardenIO/configuration/devices.json
-GardenIO/configuration/...
+GardenIO/configuration/genericDevices.json
 
 */////////////////////////////////////////
 
@@ -28,5 +30,6 @@ public:
     Configuration();
     ~Configuration();
     void LoadConfiguration();
+    std::vector<Device> GetDevices();
     void Print();
 };

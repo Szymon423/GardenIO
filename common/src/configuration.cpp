@@ -105,6 +105,7 @@ void Configuration::LoadConfiguration()
     ReadConfigFile();
 }
 
+
 void Configuration::LoadGenericConfiguration()
 {
     map.clear();
@@ -120,4 +121,10 @@ void Configuration::Print()
     {
         std::cout << dev.PrintDeviceInfo() << std::endl;
     }
+}
+
+
+std::vector<Device> Configuration::GetDevices()
+{
+    return devices;
 }

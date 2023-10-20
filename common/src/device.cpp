@@ -14,24 +14,26 @@ Device::Device()
 }
 
 
-Device::Device(DeviceType dt, const std::string& ip)
+Device::Device(const DeviceType& dt, const std::string& ip)
     : deviceType(dt), IP(ip), deviceName(DeviceTypeToString(dt)), ModbusEnabled(false)
 {
 
 }
 
-Device::Device(DeviceType dt, const std::string& ip, bool modbusEnabled, int port, const std::vector<ModbusSignal>& signals)
+
+Device::Device(const DeviceType& dt, const std::string& ip, bool modbusEnabled, int port, const std::vector<ModbusSignal>& signals)
     : deviceType(dt), IP(ip), ModbusEnabled(modbusEnabled), ModbusPort(port), ModbusSignals(signals), deviceName(DeviceTypeToString(dt))
 {
 
 }
 
 
-Device::Device(DeviceType dt, const std::string& ip, const std::string& name, bool modbusEnabled, int port, const std::vector<ModbusSignal>& signals)
+Device::Device(const DeviceType& dt, const std::string& ip, const std::string& name, bool modbusEnabled, int port, const std::vector<ModbusSignal>& signals)
     : deviceType(dt), IP(ip), ModbusEnabled(modbusEnabled), ModbusPort(port), ModbusSignals(signals), deviceName(name)
 {
 
 }
+
 
 Device::Device(const Device& dev, const std::string& ip, const std::string& name)
     : deviceType(dev.deviceType), IP(ip), deviceName(name), ModbusEnabled(dev.ModbusEnabled), ModbusPort(dev.ModbusPort), ModbusSignals(dev.ModbusSignals)
