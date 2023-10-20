@@ -30,6 +30,8 @@ public:
     Device(const Device& dev, const std::string& ip, const std::string& name);
     std::vector<ModbusSignal> GetModbusSignals();
     std::string PrintDeviceInfo();
+    std::string GetIP();
+    int GetModbusPort();
 };
 
 

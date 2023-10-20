@@ -18,7 +18,6 @@ class Configuration
 private:
     const std::string genericDevicesPath{"GardenIO/configuration/genericDevices.json"};
     const std::string devicesPath{"GardenIO/configuration/devices.json"};
-    std::vector<Device> devices;
     std::vector<Device> genericDevices;
     std::map<DeviceType, int> map;
     void CheckFileExist(const std::string& path);
@@ -27,6 +26,7 @@ private:
     void LoadGenericConfiguration();
     
 public:
+    std::vector<Device> devices;
     Configuration();
     ~Configuration();
     void LoadConfiguration();

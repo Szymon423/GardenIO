@@ -77,6 +77,18 @@ std::string Device::PrintDeviceInfo()
 }
 
 
+std::string Device::GetIP()
+{
+    return IP;
+}
+
+
+int Device::GetModbusPort()
+{
+    return ModbusPort;
+}
+
+
 DeviceType StringToDeviceType(std::string deviceType)
 {
     if (deviceType == "NODE_1") return DeviceType::NODE_1;

@@ -13,6 +13,7 @@
 #include "mqtt_client.hpp"
 #include "wind_sensor.hpp"
 #include "configuration.hpp"
+#include "device.hpp"
 
 int main()
 {
@@ -22,6 +23,15 @@ int main()
     Configuration config;
     config.LoadConfiguration();
     config.Print();
+
+    Modbus mb;
+    Device dev& = config.devices.at(0);
+    mb.SetConnectionParams(dev.GetIP(), dev.GetModbusPort());
+    mb.SetConnectionInterval(1);
+    mb.SetSignalsDefinitions(dev.GetModbusSignals());
+    
+    std::thread modbus_thread(&Modbus::RunInLoop, &mb);
+
     
     // sqlite_wrapper db("./database/test.db");
     // int ret = db.create_tables();
