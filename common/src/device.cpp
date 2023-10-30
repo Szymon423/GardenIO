@@ -57,7 +57,7 @@ std::string Device::PrintDeviceInfo()
     if (ModbusEnabled)
     {
         ss << ":" << ModbusPort << "\n";
-        ss << "Modbus Signals: \n";
+        ss << "ModbusClient Signals: \n";
         for (const auto& sig : ModbusSignals)
         {
             ss << ModbusRegionToString(sig.region) << " : ";

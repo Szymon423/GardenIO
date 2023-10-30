@@ -13,7 +13,7 @@
 #define MAX_INPUT_REGISTERS_NUMBER 1000
 
 
-class Modbus
+class ModbusClient
 {
 private:
     std::mutex mtx;
@@ -52,8 +52,8 @@ private:
 
 
 public:
-    Modbus() = default;
-    ~Modbus();
+    ModbusClient() = default;
+    ~ModbusClient();
     void SetConnectionParams(std::string newIp, int newPort);
     void SetConnectionInterval(time_t intervalTime);
     void SetSignalsDefinitions(std::vector<ModbusSignal> inputSignalsDefinitions);

@@ -11,27 +11,27 @@
 #include "log.hpp"
 
 
-Modbus::~Modbus()
+ModbusClient::~ModbusClient()
 {
     modbus_close(mb);
     modbus_free(mb);
 }
 
 
-void Modbus::SetConnectionParams(std::string newIp, int newPort)
+void ModbusClient::SetConnectionParams(std::string newIp, int newPort)
 {
     ip = newIp;
     port = newPort;
 }
 
 
-void Modbus::SetConnectionInterval(time_t intervalTime)
+void ModbusClient::SetConnectionInterval(time_t intervalTime)
 {
     interval = intervalTime;
 }
 
 
-void Modbus::SetSignalsDefinitions(std::vector<ModbusSignal> inputSignalsDefinitions)
+void ModbusClient::SetSignalsDefinitions(std::vector<ModbusSignal> inputSignalsDefinitions)
 {
     mtx.lock();
     modbusSignals = inputSignalsDefinitions;
@@ -45,7 +45,7 @@ void Modbus::SetSignalsDefinitions(std::vector<ModbusSignal> inputSignalsDefinit
 }
 
 
-void Modbus::RunInLoop()
+void ModbusClient::RunInLoop()
 {
     mb = modbus_new_tcp(ip.c_str(), port);
     if (mb == NULL)
@@ -84,7 +84,7 @@ void Modbus::RunInLoop()
 }
 
 
-void Modbus::CreateContiniousRegistersSet()
+void ModbusClient::CreateContiniousRegistersSet()
 {
     std::vector<ModbusSignal> _coils;
     std::vector<ModbusSignal> _inputs;
@@ -185,7 +185,7 @@ void Modbus::CreateContiniousRegistersSet()
 }
 
 
-void Modbus::ReadCoils()
+void ModbusClient::ReadCoils()
 {
     for (RegistersSet& set : continiousRegions_coils)
     {
@@ -198,7 +198,7 @@ void Modbus::ReadCoils()
 }
 
 
-void Modbus::ReadInputs()
+void ModbusClient::ReadInputs()
 {
     for (RegistersSet& set : continiousRegions_inputs)
     {
@@ -211,7 +211,7 @@ void Modbus::ReadInputs()
 }
 
 
-void Modbus::ReadHoldingRegisters()
+void ModbusClient::ReadHoldingRegisters()
 {
     for (RegistersSet& set : continiousRegions_holdingRegisters)
     {
@@ -224,7 +224,7 @@ void Modbus::ReadHoldingRegisters()
 }
 
 
-void Modbus::ReadInputRegisters()
+void ModbusClient::ReadInputRegisters()
 {
     for (RegistersSet& set : continiousRegions_inputRegisters)
     {
@@ -236,7 +236,7 @@ void Modbus::ReadInputRegisters()
 }
 
 
-void Modbus::InterpreteRegisters()
+void ModbusClient::InterpreteRegisters()
 {
     LOG_TRACE("Interpreting {} signalns", modbusSignals.size());
     std::scoped_lock lock(mtx);
@@ -262,7 +262,7 @@ void Modbus::InterpreteRegisters()
 }
 
 
-void Modbus::TranslateRegistersToValue(uint16_t* ptr_registers, ModbusSignal* ptr_signal)
+void ModbusClient::TranslateRegistersToValue(uint16_t* ptr_registers, ModbusSignal* ptr_signal)
 {
     std::vector<int> order32big = { 2, 3, 0, 1 };
     std::vector<int> order32little = { 1, 0, 3, 2 };
@@ -367,7 +367,7 @@ void Modbus::TranslateRegistersToValue(uint16_t* ptr_registers, ModbusSignal* pt
 }
 
 
-void Modbus::TranslateRegistersToValue(uint8_t* ptr_registers, ModbusSignal* ptr_signal)
+void ModbusClient::TranslateRegistersToValue(uint8_t* ptr_registers, ModbusSignal* ptr_signal)
 {
     switch (ptr_signal->dataType)
     {
@@ -380,7 +380,7 @@ void Modbus::TranslateRegistersToValue(uint8_t* ptr_registers, ModbusSignal* ptr
 }
 
 
-void Modbus::SetSignal(ModbusOrder order)
+void ModbusClient::SetSignal(ModbusOrder order)
 {
     std::scoped_lock lock(mtx);
     try 
@@ -397,7 +397,7 @@ void Modbus::SetSignal(ModbusOrder order)
 }
 
 
-void Modbus::ExecuteOrders()
+void ModbusClient::ExecuteOrders()
 {
     std::scoped_lock lock(mtx);
     LOG_TRACE("Executing {} orders", orders.size());
@@ -419,7 +419,7 @@ void Modbus::ExecuteOrders()
             }
             default:
             {
-                LOG_WARN("Order with invalid Modbus Region");
+                LOG_WARN("Order with invalid ModbusClient Region");
             }
         }
         orders.erase(orders.begin());
@@ -427,7 +427,7 @@ void Modbus::ExecuteOrders()
 }
 
 
-uint16_t* Modbus::TranslateValueToRegisters(ModbusSignal& signal, ModbusValue orderValue)
+uint16_t* ModbusClient::TranslateValueToRegisters(ModbusSignal& signal, ModbusValue orderValue)
 {
     std::vector<int> order32big = { 2, 3, 0, 1 };
     std::vector<int> order32little = { 1, 0, 3, 2 };

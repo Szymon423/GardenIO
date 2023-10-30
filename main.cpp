@@ -24,19 +24,19 @@ int main()
     config.LoadConfiguration();
     config.Print();
 
-    Modbus mb;
-    Device dev& = config.devices.at(0);
+    ModbusClient mb;
+    Device& dev = config.devices.at(0);
     mb.SetConnectionParams(dev.GetIP(), dev.GetModbusPort());
     mb.SetConnectionInterval(1);
     mb.SetSignalsDefinitions(dev.GetModbusSignals());
     
-    std::thread modbus_thread(&Modbus::RunInLoop, &mb);
+    std::thread modbus_thread(&ModbusClient::RunInLoop, &mb);
 
     
     // sqlite_wrapper db("./database/test.db");
     // int ret = db.create_tables();
 
-    // Modbus mb;
+    // ModbusClient mb;
     // mb.SetConnectionParams("192.168.0.172", 502);
     // mb.SetConnectionInterval(1);
     
@@ -85,7 +85,7 @@ int main()
 
     // mb.SetSignalsDefinitions(vect);
     
-    // std::thread modbus_thread(&Modbus::RunInLoop, &mb);
+    // std::thread modbus_thread(&ModbusClient::RunInLoop, &mb);
 
     // for (int i = 0; i < 10; i++)
     // {
