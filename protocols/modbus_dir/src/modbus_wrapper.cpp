@@ -542,3 +542,21 @@ uint16_t* ModbusClient::TranslateValueToRegisters(ModbusSignal& signal, ModbusVa
 }
 
 
+ModbusServer::ModbusServer()
+
+
+void ModbusServer::SetModbusMapping()
+{
+    mb_mapping = modbus_mapping_new(
+        BITS_ADDRESS + BITS_NB,
+        INPUT_BITS_ADDRESS + INPUT_BITS_NB,
+        REGISTERS_ADDRESS + REGISTERS_NB,
+        INPUT_REGISTERS_ADDRESS + INPUT_REGISTERS_NB
+    );
+    if (mb_mapping == NULL) 
+    {
+        LOG_ERROR("Failed to allocate the mapping: {}", modbus_strerror(errno));
+        modbus_free(mb);
+        return -1;
+    }
+}
