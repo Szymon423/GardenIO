@@ -137,3 +137,9 @@ T SwapBytesInOrder(uint16_t* oryginal, std::vector<int>& order)
     
     return newValue;
 }
+
+
+
+void TranslateRegistersToValue(uint16_t* ptr_registers, ModbusSignal* ptr_signal);
+void TranslateRegistersToValue(uint8_t* ptr_registers, ModbusSignal* ptr_signal);
+uint16_t* TranslateValueToRegisters(ModbusSignal& signal, ModbusValue orderValue);

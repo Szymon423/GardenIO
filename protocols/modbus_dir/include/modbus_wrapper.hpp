@@ -47,11 +47,7 @@ private:
     void ReadHoldingRegisters();
     void ReadInputRegisters();
     void InterpreteRegisters();
-    void TranslateRegistersToValue(uint16_t* ptr_registers, ModbusSignal* ptr_signal);
-    void TranslateRegistersToValue(uint8_t* ptr_registers, ModbusSignal* ptr_signal);
     void ExecuteOrders();
-    uint16_t* TranslateValueToRegisters(ModbusSignal& signal, ModbusValue orderValue);
-
 
 public:
     ModbusClient() = default;
@@ -73,20 +69,18 @@ private:
     modbus_mapping_t* mb_mapping;
     std::string ip;
     uint8_t *query;
-    int headeLlength;
+    int headerLength;
     int port;
     int returnedValue;
     bool keepWorking;
     std::vector<ModbusSignal> modbusSignals;
     std::atomic_bool needToUpdate{ 0 };
+    std::atomic_bool work;
+
 
     void InternalUpdater();
     void SetModbusMapping();
     void InterpreteRegisters();
-    void TranslateRegistersToValue(uint16_t* ptr_registers, ModbusSignal* ptr_signal);
-    void TranslateRegistersToValue(uint8_t* ptr_registers, ModbusSignal* ptr_signal);
-    uint16_t* TranslateValueToRegisters(ModbusSignal& signal, ModbusValue orderValue);
-
 
 public:
     ModbusServer() = default;
@@ -97,4 +91,5 @@ public:
     void UpdateMultipleModbusSignals(std::vector<int> signalNumbers, std::vector<ModbusValue> newValues);
     void UpdateAllModbusSignals(std::vector<ModbusValue> newValues);
     void RunServer();
+    void StopServer();
 };

@@ -245,7 +245,7 @@ void ModbusClient::InterpreteRegisters()
         switch (modbusSignals.at(i).region)
         {
             case ModbusRegion::COILS:
-               TranslateRegistersToValue(&coils[modbusSignals.at(i).offset], &modbusSignals.at(i));
+                TranslateRegistersToValue(&coils[modbusSignals.at(i).offset], &modbusSignals.at(i));
                 break;
             case ModbusRegion::INPUTS:
                 TranslateRegistersToValue(&inputs[modbusSignals.at(i).offset], &modbusSignals.at(i));
@@ -258,124 +258,6 @@ void ModbusClient::InterpreteRegisters()
                 break;
         }
         LOG_TRACE("Signal {}: {}", i, ModbusValueToString(modbusSignals.at(i)));
-    }
-}
-
-
-void ModbusClient::TranslateRegistersToValue(uint16_t* ptr_registers, ModbusSignal* ptr_signal)
-{
-    std::vector<int> order32big = { 2, 3, 0, 1 };
-    std::vector<int> order32little = { 1, 0, 3, 2 };
-    std::vector<int> order64big = { 6, 7, 4, 5, 2, 3, 0, 1 };
-    std::vector<int> order64little = { 1, 0, 3, 2, 5, 4, 7, 6 };
-    
-    switch (ptr_signal->dataType)
-    {
-        case ModbusDataType::UINT_16:
-        {
-            ptr_signal->value.UINT_16 = ptr_registers[0];
-            break;
-        }
-        case ModbusDataType::INT_16:
-        {
-            ptr_signal->value.INT_16 = *((int16_t*)ptr_registers);
-            break;
-        }
-        case ModbusDataType::UINT_32:
-        {
-            if (ptr_signal->endian == Endian::BIG)
-            {
-                ptr_signal->value.UINT_32 = SwapBytesInOrder<uint32_t>(ptr_registers, order32big);
-            }
-            else
-            {
-                ptr_signal->value.UINT_32 = SwapBytesInOrder<uint32_t>(ptr_registers, order32little);
-            }
-            break;
-        }
-        case ModbusDataType::INT_32:
-        {
-            if (ptr_signal->endian == Endian::BIG)
-            {
-                ptr_signal->value.INT_32 = SwapBytesInOrder<int32_t>(ptr_registers, order32big);
-            }
-            else
-            {
-                ptr_signal->value.INT_32 = SwapBytesInOrder<int32_t>(ptr_registers, order32little);
-            }
-            break;
-        }
-        case ModbusDataType::FLOAT:
-        {
-            uint32_t temp_uint32;
-            if (ptr_signal->endian == Endian::BIG)
-            {
-                temp_uint32 = SwapBytesInOrder<uint32_t>(ptr_registers, order32big);
-                ptr_signal->value.FLOAT = *((float*)&temp_uint32);   
-            }
-            else
-            {
-                temp_uint32 = SwapBytesInOrder<uint32_t>(ptr_registers, order32little);
-                ptr_signal->value.FLOAT = *((float*)&temp_uint32); 
-            }
-            break;
-        }
-        case ModbusDataType::UINT_64:
-        {
-            if (ptr_signal->endian == Endian::BIG)
-            {
-                ptr_signal->value.UINT_64 = SwapBytesInOrder<uint64_t>(ptr_registers, order64big);
-            }
-            else
-            {
-                ptr_signal->value.UINT_64 = SwapBytesInOrder<uint64_t>(ptr_registers, order64little);
-            }
-            break;
-        }
-        case ModbusDataType::INT_64:
-        {
-            if (ptr_signal->endian == Endian::BIG)
-            {
-                ptr_signal->value.INT_64 = SwapBytesInOrder<int64_t>(ptr_registers, order64big); 
-            }
-            else
-            {
-                ptr_signal->value.INT_64 = SwapBytesInOrder<int64_t>(ptr_registers, order64little);
-            }
-            break;
-        }
-        case ModbusDataType::DOUBLE:
-        {
-            uint64_t temp_uint64;
-            if (ptr_signal->endian == Endian::BIG)
-            {
-                temp_uint64 = SwapBytesInOrder<uint64_t>(ptr_registers, order64big);
-                ptr_signal->value.DOUBLE = *((double*)&temp_uint64);     
-            }
-            else
-            {
-                temp_uint64 = SwapBytesInOrder<uint64_t>(ptr_registers, order64little);
-                ptr_signal->value.DOUBLE = *((double*)&temp_uint64);  
-            }
-            break;
-        }
-        default:
-        {
-            break;
-        }
-    }
-}
-
-
-void ModbusClient::TranslateRegistersToValue(uint8_t* ptr_registers, ModbusSignal* ptr_signal)
-{
-    switch (ptr_signal->dataType)
-    {
-        case ModbusDataType::BOOL:
-        {
-            ptr_signal->value.UINT_16 = ptr_registers[0];
-            break;
-        }
     }
 }
 
@@ -425,122 +307,6 @@ void ModbusClient::ExecuteOrders()
         orders.erase(orders.begin());
     }
 }
-
-
-uint16_t* ModbusClient::TranslateValueToRegisters(ModbusSignal& signal, ModbusValue orderValue)
-{
-    std::vector<int> order32big = { 2, 3, 0, 1 };
-    std::vector<int> order32little = { 1, 0, 3, 2 };
-    std::vector<int> order64big = { 6, 7, 4, 5, 2, 3, 0, 1 };
-    std::vector<int> order64little = { 1, 0, 3, 2, 5, 4, 7, 6 };
-
-    uint16_t* ptr = new uint16_t[DataTypeLength(signal.dataType)];
-
-
-    switch (signal.dataType)
-    {
-        case ModbusDataType::UINT_16:
-        {
-            *ptr = orderValue.UINT_16;
-            break;
-        }
-        case ModbusDataType::INT_16:
-        {
-            *ptr = orderValue.INT_16;
-            break;
-        }
-        case ModbusDataType::UINT_32:
-        {
-            uint32_t value; 
-            if (signal.endian == Endian::BIG)
-            {
-                value = SwapBytesInOrder<uint32_t>((uint16_t*)&orderValue.UINT_32, order32big);
-            }
-            else
-            {
-                value = SwapBytesInOrder<uint32_t>((uint16_t*)&orderValue.UINT_32, order32little);
-            }
-            std::memcpy(ptr, &value, 4);
-            break;
-        }
-        case ModbusDataType::INT_32:
-        {
-            int32_t value;
-            if (signal.endian == Endian::BIG)
-            {
-                value = SwapBytesInOrder<int32_t>((uint16_t*)&orderValue.INT_32, order32big);
-            }
-            else
-            {
-                value = SwapBytesInOrder<int32_t>((uint16_t*)&orderValue.INT_32, order32little);
-            }
-            std::memcpy(ptr, &value, 4);
-            break;
-        }
-        case ModbusDataType::FLOAT:
-        {
-            uint32_t temp_uint32;
-            if (signal.endian == Endian::BIG)
-            {
-                temp_uint32 = SwapBytesInOrder<uint32_t>((uint16_t*)&orderValue.FLOAT, order32big);
-            }
-            else
-            {
-                temp_uint32 = SwapBytesInOrder<uint32_t>((uint16_t*)&orderValue.FLOAT, order32little);
-            }
-            std::memcpy(ptr, &temp_uint32, 4);
-            break;
-        }
-        case ModbusDataType::UINT_64:
-        {
-            uint64_t value; 
-            if (signal.endian == Endian::BIG)
-            {
-                value = SwapBytesInOrder<uint64_t>((uint16_t*)&orderValue.UINT_64, order64big);
-            }
-            else
-            {
-                value = SwapBytesInOrder<uint64_t>((uint16_t*)&orderValue.UINT_64, order64little);
-            }
-            std::memcpy(ptr, &value, 8);
-            break;
-        }
-        case ModbusDataType::INT_64:
-        {
-            int64_t value;
-            if (signal.endian == Endian::BIG)
-            {
-                value = SwapBytesInOrder<int64_t>((uint16_t*)&orderValue.INT_64, order64big);
-            }
-            else
-            {
-                value = SwapBytesInOrder<int64_t>((uint16_t*)&orderValue.INT_64, order64little);
-            }
-            std::memcpy(ptr, &value, 8);
-            break;
-        }
-        case ModbusDataType::DOUBLE:
-        {
-            uint64_t temp_uint64;
-            if (signal.endian == Endian::BIG)
-            {
-                temp_uint64 = SwapBytesInOrder<uint64_t>((uint16_t*)&orderValue.DOUBLE, order64big);
-            }
-            else
-            {
-                temp_uint64 = SwapBytesInOrder<uint64_t>((uint16_t*)&orderValue.DOUBLE, order64little);
-            }
-            std::memcpy(ptr, &temp_uint64, 8);
-            break;
-        }
-        default:
-        {
-            break;
-        }
-    }
-    return ptr;
-}
-
 
 
 ModbusServer::~ModbusServer()
@@ -668,18 +434,17 @@ void ModbusServer::InternalUpdater()
             }
             case ModbusRegion::HOLDING_REGISTERS:
             {
-                std::memcpy(&mb_mapping->tab_registers[signal.offset], TranslateValueToRegisters(signal, signal.value), 2 * DataTypeLength(signal.dataType))
+                std::memcpy(&mb_mapping->tab_registers[signal.offset], TranslateValueToRegisters(signal, signal.value), 2 * DataTypeLength(signal.dataType));
                 break;
             }
             case ModbusRegion::INPUT_REGISTERS:
             {
-                std::memcpy(&mb_mapping->tab_input_registers[signal.offset], TranslateValueToRegisters(signal, signal.value), 2 * DataTypeLength(signal.dataType))
+                std::memcpy(&mb_mapping->tab_input_registers[signal.offset], TranslateValueToRegisters(signal, signal.value), 2 * DataTypeLength(signal.dataType));
                 break;
             }
             default:
             {
                 LOG_ERROR("Unknown Modbus region in internal updater.");
-                return;
             }
         }
     }
@@ -697,98 +462,49 @@ void ModbusServer::SetConnectionParams(std::string newIp, int newPort)
 // TODO convert to my approach
 void ModbusServer::RunServer()
 {
-    headeLlength = modbus_get_header_length(mb);
+    headerLength = modbus_get_header_length(mb);
     mb = modbus_new_tcp(ip.c_str(), port);
-    query = malloc(MODBUS_TCP_MAX_ADU_LENGTH);
+    query = new u_int8_t[MODBUS_TCP_MAX_ADU_LENGTH];
     SetModbusMapping();
 
     int s = modbus_tcp_listen(mb, 1);
     modbus_tcp_accept(mb, &s);
 
+    work = true;
 
-    while (true) 
+    while (work) 
     {
+        int rc;
         do 
         {
             if (needToUpdate)
             {
                 InternalUpdater();
             }
-            rc = modbus_receive(ctx, query);
+            rc = modbus_receive(mb, query);
         } 
         while (rc == 0);
 
-        /* The connection is not closed on errors which require on reply such as
-           bad CRC in RTU. */
-        if (rc == -1 && errno != EMBBADCRC) {
-            /* Quit */
+        // The connection is not closed on errors which require on reply such as bad CRC in RTU
+        if (rc == -1 && errno != EMBBADCRC) 
+        {
             break;
         }
 
-        /* Special server behavior to test client */
-        if (query[headerLength] == 0x03) {
-            /* Read holding registers */
-
-            if (MODBUS_GET_INT16_FROM_INT8(query, header_length + 3) ==
-                UT_REGISTERS_NB_SPECIAL) {
-                printf("Set an incorrect number of values\n");
-                MODBUS_SET_INT16_TO_INT8(
-                    query, header_length + 3, UT_REGISTERS_NB_SPECIAL - 1);
-            } else if (MODBUS_GET_INT16_FROM_INT8(query, header_length + 1) ==
-                       UT_REGISTERS_ADDRESS_SPECIAL) {
-                printf("Reply to this special register address by an exception\n");
-                modbus_reply_exception(ctx, query, MODBUS_EXCEPTION_SLAVE_OR_SERVER_BUSY);
-                continue;
-            } else if (MODBUS_GET_INT16_FROM_INT8(query, header_length + 1) ==
-                       UT_REGISTERS_ADDRESS_INVALID_TID_OR_SLAVE) {
-                const int RAW_REQ_LENGTH = 5;
-                uint8_t raw_req[] = {(use_backend == RTU) ? INVALID_SERVER_ID : 0xFF,
-                                     0x03,
-                                     0x02,
-                                     0x00,
-                                     0x00};
-
-                printf("Reply with an invalid TID or slave\n");
-                modbus_send_raw_request(ctx, raw_req, RAW_REQ_LENGTH * sizeof(uint8_t));
-                continue;
-            } else if (MODBUS_GET_INT16_FROM_INT8(query, header_length + 1) ==
-                       UT_REGISTERS_ADDRESS_SLEEP_500_MS) {
-                printf("Sleep 0.5 s before replying\n");
-                usleep(500000);
-            } else if (MODBUS_GET_INT16_FROM_INT8(query, header_length + 1) ==
-                       UT_REGISTERS_ADDRESS_BYTE_SLEEP_5_MS) {
-                /* Test low level only available in TCP mode */
-                /* Catch the reply and send reply byte a byte */
-                uint8_t req[] = "\x00\x1C\x00\x00\x00\x05\xFF\x03\x02\x00\x00";
-                int req_length = 11;
-                int w_s = modbus_get_socket(ctx);
-                if (w_s == -1) {
-                    fprintf(stderr, "Unable to get a valid socket in special test\n");
-                    continue;
-                }
-
-                /* Copy TID */
-                req[1] = query[1];
-                for (i = 0; i < req_length; i++) {
-                    printf("(%.2X)", req[i]);
-                    usleep(5000);
-                    rc = send(w_s, (const char *) (req + i), 1, MSG_NOSIGNAL);
-                    if (rc == -1) {
-                        break;
-                    }
-                }
-                continue;
-            }
-        }
-
-        rc = modbus_reply(ctx, query, rc, mb_mapping);
+        returnedValue = modbus_reply(mb, query, rc, mb_mapping);
         if (rc == -1) {
             break;
         }
     }
 
     modbus_mapping_free(mb_mapping);
-    free(query);
+    delete[] query;
     modbus_close(mb);
     modbus_free(mb);
+}
+
+
+void ModbusServer::StopServer()
+{
+    work = false;
 }
