@@ -30,7 +30,7 @@ int main()
     mb.SetConnectionInterval(1);
     mb.SetSignalsDefinitions(dev.GetModbusSignals());
     
-    std::thread modbus_thread(&ModbusClient::RunInLoop, &mb);
+    std::thread modbus_thread(&ModbusClient::RunClient, &mb);
 
     
     // sqlite_wrapper db("./database/test.db");
@@ -85,7 +85,7 @@ int main()
 
     // mb.SetSignalsDefinitions(vect);
     
-    // std::thread modbus_thread(&ModbusClient::RunInLoop, &mb);
+    // std::thread modbus_thread(&ModbusClient::RunClient, &mb);
 
     // for (int i = 0; i < 10; i++)
     // {

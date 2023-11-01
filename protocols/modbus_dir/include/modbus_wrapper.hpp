@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <mutex>
+#include <atomic>
 #include <time.h>
 #include "modbus_definitions.hpp"
 
@@ -58,7 +59,7 @@ public:
     void SetConnectionParams(std::string newIp, int newPort);
     void SetConnectionInterval(time_t intervalTime);
     void SetSignalsDefinitions(std::vector<ModbusSignal> inputSignalsDefinitions);
-    void RunInLoop();
+    void RunClient();
     void SetSignal(ModbusOrder order);
 };
 
@@ -69,24 +70,17 @@ class ModbusServer
 private:
     std::mutex mtx;
     modbus_t* mb;
-    modbus_mapping_t* mb_mapping*;
+    modbus_mapping_t* mb_mapping;
+    std::string ip;
+    uint8_t *query;
+    int headeLlength;
     int port;
     int returnedValue;
     bool keepWorking;
-
-    uint8_t coils[MAX_COILS_NUMBER];
-    uint8_t inputs[MAX_INPUTS_NUMBER];
-    uint16_t holdingRegisters[MAX_HOLDING_REGISTERS_NUMBER];
-    uint16_t inputRegisters[MAX_INPUT_REGISTERS_NUMBER];
-
     std::vector<ModbusSignal> modbusSignals;
-    std::vector<RegistersSet> continiousRegions_coils;
-    std::vector<RegistersSet> continiousRegions_inputs;
-    std::vector<RegistersSet> continiousRegions_holdingRegisters;
-    std::vector<RegistersSet> continiousRegions_inputRegisters;
+    std::atomic_bool needToUpdate{ 0 };
 
-    std::vector<ModbusOrder> orders;
-
+    void InternalUpdater();
     void SetModbusMapping();
     void InterpreteRegisters();
     void TranslateRegistersToValue(uint16_t* ptr_registers, ModbusSignal* ptr_signal);
@@ -97,4 +91,10 @@ private:
 public:
     ModbusServer() = default;
     ~ModbusServer();
+    void SetConnectionParams(std::string newIp, int newPort);
+    void SetSignalsDefinitions(std::vector<ModbusSignal> inputSignalsDefinitions);
+    void UpdateModbusSignal(int signalNumber, ModbusValue newValue);
+    void UpdateMultipleModbusSignals(std::vector<int> signalNumbers, std::vector<ModbusValue> newValues);
+    void UpdateAllModbusSignals(std::vector<ModbusValue> newValues);
+    void RunServer();
 };

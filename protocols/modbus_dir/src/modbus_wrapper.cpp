@@ -45,7 +45,7 @@ void ModbusClient::SetSignalsDefinitions(std::vector<ModbusSignal> inputSignalsD
 }
 
 
-void ModbusClient::RunInLoop()
+void ModbusClient::RunClient()
 {
     mb = modbus_new_tcp(ip.c_str(), port);
     if (mb == NULL)
@@ -542,21 +542,253 @@ uint16_t* ModbusClient::TranslateValueToRegisters(ModbusSignal& signal, ModbusVa
 }
 
 
-ModbusServer::ModbusServer()
+
+ModbusServer::~ModbusServer()
+{
+    modbus_mapping_free(mb_mapping);
+    modbus_close(mb);
+    modbus_free(mb);
+}
 
 
 void ModbusServer::SetModbusMapping()
 {
-    mb_mapping = modbus_mapping_new(
-        BITS_ADDRESS + BITS_NB,
-        INPUT_BITS_ADDRESS + INPUT_BITS_NB,
-        REGISTERS_ADDRESS + REGISTERS_NB,
-        INPUT_REGISTERS_ADDRESS + INPUT_REGISTERS_NB
-    );
+    int coils_number = 0;
+    int inputs_number = 0;
+    int holdingRegisters_number = 0;
+    int inputRegisters_number = 0;
+
+    if (modbusSignals.size() < 1)
+    {
+        LOG_ERROR("No signals definitions found.");
+        returnedValue = -1;
+        return;
+    }
+
+    for (auto& signal : modbusSignals)
+    {
+        if (signal.region == ModbusRegion::COILS) coils_number += 1;
+        else if (signal.region == ModbusRegion::INPUTS) inputs_number += 1;
+        else if (signal.region == ModbusRegion::HOLDING_REGISTERS) holdingRegisters_number += DataTypeLength(signal.dataType);
+        else if (signal.region == ModbusRegion::INPUT_REGISTERS) inputRegisters_number += DataTypeLength(signal.dataType);
+    }
+
+    mb_mapping = modbus_mapping_new(coils_number, inputs_number, holdingRegisters_number, inputRegisters_number);
+
     if (mb_mapping == NULL) 
     {
         LOG_ERROR("Failed to allocate the mapping: {}", modbus_strerror(errno));
         modbus_free(mb);
-        return -1;
+        returnedValue = -1;
     }
+}
+
+
+void ModbusServer::SetSignalsDefinitions(std::vector<ModbusSignal> inputSignalsDefinitions)
+{
+    mtx.lock();
+    modbusSignals = inputSignalsDefinitions;
+    mtx.unlock();
+    LOG_TRACE("New signal definitions:");
+    for (int i = 0; i < modbusSignals.size(); i++)
+    {
+        LOG_TRACE("{}", ModbusSignalInfo(modbusSignals.at(i)));
+    }
+}
+
+
+void ModbusServer::UpdateModbusSignal(int signalNumber, ModbusValue newValue)
+{
+    if (signalNumber >= modbusSignals.size() || signalNumber < 0)
+    {
+        LOG_ERROR("Trying to update signal with number: {} excids defined modbusSignals.", signalNumber);
+        return;
+    }
+    std::scoped_lock lock(mtx);
+    modbusSignals.at(signalNumber).value = newValue;
+    needToUpdate = true;
+}
+
+
+void ModbusServer::UpdateMultipleModbusSignals(std::vector<int> signalNumbers, std::vector<ModbusValue> newValues)
+{
+    if (signalNumbers.size() != newValues.size())
+    {
+        LOG_ERROR("signalNumbers size not equal to newValues size.")
+        return;
+    }
+    std::scoped_lock lock(mtx);
+    for (auto& signalNumber : signalNumbers)
+    {
+        if (signalNumber >= modbusSignals.size() || signalNumber < 0)
+        {
+            LOG_ERROR("Trying to update signal with: {} number excids defined modbusSignals.", signalNumber);
+            continue;
+        }
+        modbusSignals.at(signalNumber).value = newValues.at(signalNumber);
+    }
+
+    needToUpdate = true;
+}
+
+
+void ModbusServer::UpdateAllModbusSignals(std::vector<ModbusValue> newValues)
+{
+    if (modbusSignals.size() != newValues.size())
+    {
+        LOG_ERROR("newValues size not equal to modbusSignals size.")
+        return;
+    }
+    std::scoped_lock lock(mtx);
+    for (int i = 0; i < newValues.size(); i++)
+    {
+        modbusSignals.at(i).value = newValues.at(i);
+    }
+
+    needToUpdate = true;
+}
+
+
+void ModbusServer::InternalUpdater()
+{
+    std::scoped_lock lock(mtx);
+    for (auto& signal : modbusSignals)
+    {
+        switch (signal.region)
+        {
+            case ModbusRegion::COILS:
+            {
+                mb_mapping->tab_bits[signal.offset] = (uint8_t)signal.value.BOOL;
+                break;
+            }
+            case ModbusRegion::INPUTS:
+            {
+                mb_mapping->tab_input_bits[signal.offset] = (uint8_t)signal.value.BOOL;
+                break;
+            }
+            case ModbusRegion::HOLDING_REGISTERS:
+            {
+                std::memcpy(&mb_mapping->tab_registers[signal.offset], TranslateValueToRegisters(signal, signal.value), 2 * DataTypeLength(signal.dataType))
+                break;
+            }
+            case ModbusRegion::INPUT_REGISTERS:
+            {
+                std::memcpy(&mb_mapping->tab_input_registers[signal.offset], TranslateValueToRegisters(signal, signal.value), 2 * DataTypeLength(signal.dataType))
+                break;
+            }
+            default:
+            {
+                LOG_ERROR("Unknown Modbus region in internal updater.");
+                return;
+            }
+        }
+    }
+    needToUpdate = false;
+}
+
+
+void ModbusServer::SetConnectionParams(std::string newIp, int newPort)
+{
+    ip = newIp;
+    port = newPort;
+}
+
+
+// TODO convert to my approach
+void ModbusServer::RunServer()
+{
+    headeLlength = modbus_get_header_length(mb);
+    mb = modbus_new_tcp(ip.c_str(), port);
+    query = malloc(MODBUS_TCP_MAX_ADU_LENGTH);
+    SetModbusMapping();
+
+    int s = modbus_tcp_listen(mb, 1);
+    modbus_tcp_accept(mb, &s);
+
+
+    while (true) 
+    {
+        do 
+        {
+            if (needToUpdate)
+            {
+                InternalUpdater();
+            }
+            rc = modbus_receive(ctx, query);
+        } 
+        while (rc == 0);
+
+        /* The connection is not closed on errors which require on reply such as
+           bad CRC in RTU. */
+        if (rc == -1 && errno != EMBBADCRC) {
+            /* Quit */
+            break;
+        }
+
+        /* Special server behavior to test client */
+        if (query[headerLength] == 0x03) {
+            /* Read holding registers */
+
+            if (MODBUS_GET_INT16_FROM_INT8(query, header_length + 3) ==
+                UT_REGISTERS_NB_SPECIAL) {
+                printf("Set an incorrect number of values\n");
+                MODBUS_SET_INT16_TO_INT8(
+                    query, header_length + 3, UT_REGISTERS_NB_SPECIAL - 1);
+            } else if (MODBUS_GET_INT16_FROM_INT8(query, header_length + 1) ==
+                       UT_REGISTERS_ADDRESS_SPECIAL) {
+                printf("Reply to this special register address by an exception\n");
+                modbus_reply_exception(ctx, query, MODBUS_EXCEPTION_SLAVE_OR_SERVER_BUSY);
+                continue;
+            } else if (MODBUS_GET_INT16_FROM_INT8(query, header_length + 1) ==
+                       UT_REGISTERS_ADDRESS_INVALID_TID_OR_SLAVE) {
+                const int RAW_REQ_LENGTH = 5;
+                uint8_t raw_req[] = {(use_backend == RTU) ? INVALID_SERVER_ID : 0xFF,
+                                     0x03,
+                                     0x02,
+                                     0x00,
+                                     0x00};
+
+                printf("Reply with an invalid TID or slave\n");
+                modbus_send_raw_request(ctx, raw_req, RAW_REQ_LENGTH * sizeof(uint8_t));
+                continue;
+            } else if (MODBUS_GET_INT16_FROM_INT8(query, header_length + 1) ==
+                       UT_REGISTERS_ADDRESS_SLEEP_500_MS) {
+                printf("Sleep 0.5 s before replying\n");
+                usleep(500000);
+            } else if (MODBUS_GET_INT16_FROM_INT8(query, header_length + 1) ==
+                       UT_REGISTERS_ADDRESS_BYTE_SLEEP_5_MS) {
+                /* Test low level only available in TCP mode */
+                /* Catch the reply and send reply byte a byte */
+                uint8_t req[] = "\x00\x1C\x00\x00\x00\x05\xFF\x03\x02\x00\x00";
+                int req_length = 11;
+                int w_s = modbus_get_socket(ctx);
+                if (w_s == -1) {
+                    fprintf(stderr, "Unable to get a valid socket in special test\n");
+                    continue;
+                }
+
+                /* Copy TID */
+                req[1] = query[1];
+                for (i = 0; i < req_length; i++) {
+                    printf("(%.2X)", req[i]);
+                    usleep(5000);
+                    rc = send(w_s, (const char *) (req + i), 1, MSG_NOSIGNAL);
+                    if (rc == -1) {
+                        break;
+                    }
+                }
+                continue;
+            }
+        }
+
+        rc = modbus_reply(ctx, query, rc, mb_mapping);
+        if (rc == -1) {
+            break;
+        }
+    }
+
+    modbus_mapping_free(mb_mapping);
+    free(query);
+    modbus_close(mb);
+    modbus_free(mb);
 }
