@@ -2,22 +2,45 @@
 
 ## Compilation
 to compile there are few steps to proceed
-1. At first lounch You have to create docker image. Go through wsl to ./Docker folder and run
+### At first lounch You have to create docker image. Go ./Docker folder and run
 ```sh
 docker build --tag armhf-compiler-image .
 ```
 
-2. From wsl run at ./GardenIO/ run:
+### Clone essential repos
+```sh
+cd external
+```
+```sh
+git clone https://github.com/nlohmann/json.git
+```
+```sh
+git clone https://github.com/gabime/spdlog.git
+```
+
+### To Run Docker container use:
+
+If you're running this from WSL use:
+```sh
+./runDocker.sh -w
+```
+If you're running this on Linux use
 ```sh
 ./runDocker.sh
 ```
 
-3.  Run:
+### Run:
+
+To compile in release mode use:
 ```sh
 ./makeArm.sh
 ```
+In debug:
+```sh
+./makeArm.sh -d
+```
 
-4. And to exit run:
+### And to exit:
 ```sh
 exit
 ```
