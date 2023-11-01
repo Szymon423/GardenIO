@@ -71,10 +71,9 @@ int main()
     ModbusServer mb_srv;
     mb_srv.SetConnectionParams("127.0.0.1", 502);
     mb_srv.SetSignalsDefinitions(vect);
-    std::thread modbus_thread(&ModbusServer::RunServer, &mb_srv);
-
+    mb_srv.RunServer();
     std::this_thread::sleep_for(std::chrono::seconds(20));
-    
+    mb_srv.StopServer();
 
     // ModbusClient mb_cli;
     // Device& dev = config.devices.at(0);
@@ -82,7 +81,9 @@ int main()
     // mb_cli.SetConnectionInterval(1);
     // mb_cli.SetSignalsDefinitions(dev.GetModbusSignals());
     
-    // std::thread modbus_thread(&ModbusClient::RunClient, &mb_cli);
+    // mb_cli.RunClient();
+    // std::this_thread::sleep_for(std::chrono::seconds(20));
+    // mb_cli.StopClient();
 
     
     // sqlite_wrapper db("./database/test.db");

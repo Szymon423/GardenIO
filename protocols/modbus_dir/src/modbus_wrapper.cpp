@@ -47,6 +47,19 @@ void ModbusClient::SetSignalsDefinitions(std::vector<ModbusSignal> inputSignalsD
 
 void ModbusClient::RunClient()
 {
+    if (work)
+    {
+        LOG_ERROR("Modbus client is allready running, stop it firs to run it again.");
+        return;
+    }
+
+    work = true;
+    clientThread = std::thread(ClientFunction);
+}
+
+
+void ModbusClient::ClientFunction()
+{
     mb = modbus_new_tcp(ip.c_str(), port);
     if (mb == NULL)
     {
@@ -63,11 +76,9 @@ void ModbusClient::RunClient()
         LOG_TRACE("Connected to: {}:{}", ip, port);
     }
 
-    keepReading = true;
     lastReadTime = time(NULL) - 2 * interval;
-    time_t firstReadTime = lastReadTime;
-    LOG_TRACE("Starting reading loop with interval: {}", interval);
-    while (keepReading && time(NULL) < firstReadTime + 25)
+    LOG_TRACE("Starting reading loop with interval: {}ms", interval);
+    while (work)
     {
         if (time(NULL) > lastReadTime + interval)
         {
@@ -309,6 +320,12 @@ void ModbusClient::ExecuteOrders()
 }
 
 
+void ModbusClient::StopClient()
+{
+    work = false;
+    clientThread.join();
+}
+
 ModbusServer::~ModbusServer()
 {
     modbus_mapping_free(mb_mapping);
@@ -459,8 +476,21 @@ void ModbusServer::SetConnectionParams(std::string newIp, int newPort)
 }
 
 
-// TODO convert to my approach
 void ModbusServer::RunServer()
+{
+    if (work)
+    {
+        LOG_ERROR("Modbus server is allready running, stop it firs to run it again.");
+        return;
+    }
+
+    work = true;
+    serverThread = std::thread(ServerFunction);
+}
+
+
+// TODO convert to my approach
+void ModbusServer::ServerFunction()
 {
     headerLength = modbus_get_header_length(mb);
     mb = modbus_new_tcp(ip.c_str(), port);
@@ -469,8 +499,6 @@ void ModbusServer::RunServer()
 
     int s = modbus_tcp_listen(mb, 1);
     modbus_tcp_accept(mb, &s);
-
-    work = true;
 
     while (work) 
     {
@@ -507,4 +535,5 @@ void ModbusServer::RunServer()
 void ModbusServer::StopServer()
 {
     work = false;
+    serverThread.join();
 }

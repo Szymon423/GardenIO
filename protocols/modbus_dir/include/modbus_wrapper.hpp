@@ -5,6 +5,7 @@
 #include <vector>
 #include <mutex>
 #include <atomic>
+#include <thread>
 #include <time.h>
 #include "modbus_definitions.hpp"
 
@@ -26,7 +27,8 @@ private:
     time_t interval;
     time_t lastReadTime;
     int returnedValue;
-    bool keepReading;
+    std::atomic_bool work;
+    std::thread clientThread;
 
     uint8_t coils[MAX_COILS_NUMBER];
     uint8_t inputs[MAX_INPUTS_NUMBER];
@@ -48,6 +50,7 @@ private:
     void ReadInputRegisters();
     void InterpreteRegisters();
     void ExecuteOrders();
+    void ClientFunction();
 
 public:
     ModbusClient() = default;
@@ -55,8 +58,9 @@ public:
     void SetConnectionParams(std::string newIp, int newPort);
     void SetConnectionInterval(time_t intervalTime);
     void SetSignalsDefinitions(std::vector<ModbusSignal> inputSignalsDefinitions);
-    void RunClient();
     void SetSignal(ModbusOrder order);
+    void RunClient();
+    void StopClient();
 };
 
 
@@ -76,11 +80,13 @@ private:
     std::vector<ModbusSignal> modbusSignals;
     std::atomic_bool needToUpdate{ 0 };
     std::atomic_bool work;
+    std::thread serverThread;
 
 
     void InternalUpdater();
     void SetModbusMapping();
     void InterpreteRegisters();
+    void ServerFunction();
 
 public:
     ModbusServer() = default;
