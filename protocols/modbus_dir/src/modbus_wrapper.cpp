@@ -328,9 +328,7 @@ void ModbusClient::StopClient()
 
 ModbusServer::~ModbusServer()
 {
-    modbus_mapping_free(mb_mapping);
-    modbus_close(mb);
-    modbus_free(mb);
+
 }
 
 
