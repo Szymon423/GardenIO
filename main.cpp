@@ -85,7 +85,7 @@ int main()
         signals.push_back(cntr++);
         newValues.push_back(val);
 
-        val.UINT_16 = i;
+        val.INT_16 = i;
         signals.push_back(cntr++);
         newValues.push_back(val);
 
@@ -110,6 +110,14 @@ int main()
         newValues.push_back(val);
 
         val.UINT_64 = (uint64_t)i;
+        signals.push_back(cntr++);
+        newValues.push_back(val);
+
+        val.INT_64 = (int64_t)i;
+        signals.push_back(cntr++);
+        newValues.push_back(val);
+
+        val.INT_64 = (int64_t)i;
         signals.push_back(cntr++);
         newValues.push_back(val);
 
