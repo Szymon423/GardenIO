@@ -2,12 +2,12 @@ from fabric import task
 from fabric import Connection
 import os
 
-user = "szymon"
-# user = r"pi"
+# user = "szymon"
+user = r"pi"
 # compile = r"Release"
 compile = r"Debug"
-password = r"2ndRPI@"
-# password = r"1stRPI@"
+# password = r"2ndRPI@"
+password = r"1stRPI@"
 port = 22
 
 GardenIO_source_path = r"build/" + compile + r"/GardenIO"

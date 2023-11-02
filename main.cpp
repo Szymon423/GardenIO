@@ -24,55 +24,114 @@ int main()
     config.LoadConfiguration();
     config.Print();
 
-
     std::vector<ModbusSignal> vect;
-    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::UINT_16, ModbusRegion::INPUT_REGISTERS, 0));
-    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::INT_16, ModbusRegion::INPUT_REGISTERS, 1));
-    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::UINT_32, ModbusRegion::INPUT_REGISTERS, 2));
-    vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::UINT_32, ModbusRegion::INPUT_REGISTERS, 4));
-    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::INT_32, ModbusRegion::INPUT_REGISTERS, 6));
-    vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::INT_32, ModbusRegion::INPUT_REGISTERS, 8));
-    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::UINT_64, ModbusRegion::INPUT_REGISTERS, 10));
-    vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::UINT_64, ModbusRegion::INPUT_REGISTERS, 14));
-    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::INT_64, ModbusRegion::INPUT_REGISTERS, 18));
-    vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::INT_64, ModbusRegion::INPUT_REGISTERS, 22));
-    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::FLOAT, ModbusRegion::INPUT_REGISTERS, 26));
-    vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::FLOAT, ModbusRegion::INPUT_REGISTERS, 28));
-    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::DOUBLE, ModbusRegion::INPUT_REGISTERS, 30));
-    vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::DOUBLE, ModbusRegion::INPUT_REGISTERS, 34));
+    {
+        vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::UINT_16, ModbusRegion::INPUT_REGISTERS, 0));
+        vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::INT_16, ModbusRegion::INPUT_REGISTERS, 1));
+        vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::UINT_32, ModbusRegion::INPUT_REGISTERS, 2));
+        vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::UINT_32, ModbusRegion::INPUT_REGISTERS, 4));
+        vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::INT_32, ModbusRegion::INPUT_REGISTERS, 6));
+        vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::INT_32, ModbusRegion::INPUT_REGISTERS, 8));
+        vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::UINT_64, ModbusRegion::INPUT_REGISTERS, 10));
+        vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::UINT_64, ModbusRegion::INPUT_REGISTERS, 14));
+        vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::INT_64, ModbusRegion::INPUT_REGISTERS, 18));
+        vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::INT_64, ModbusRegion::INPUT_REGISTERS, 22));
+        vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::FLOAT, ModbusRegion::INPUT_REGISTERS, 26));
+        vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::FLOAT, ModbusRegion::INPUT_REGISTERS, 28));
+        vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::DOUBLE, ModbusRegion::INPUT_REGISTERS, 30));
+        vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::DOUBLE, ModbusRegion::INPUT_REGISTERS, 34));
 
-    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::UINT_16, ModbusRegion::HOLDING_REGISTERS, 0));
-    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::INT_16, ModbusRegion::HOLDING_REGISTERS, 1));
-    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::UINT_32, ModbusRegion::HOLDING_REGISTERS, 2));
-    vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::UINT_32, ModbusRegion::HOLDING_REGISTERS, 4));
-    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::INT_32, ModbusRegion::HOLDING_REGISTERS, 6));
-    vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::INT_32, ModbusRegion::HOLDING_REGISTERS, 8));
-    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::UINT_64, ModbusRegion::HOLDING_REGISTERS, 10));
-    vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::UINT_64, ModbusRegion::HOLDING_REGISTERS, 14));
-    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::INT_64, ModbusRegion::HOLDING_REGISTERS, 18));
-    vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::INT_64, ModbusRegion::HOLDING_REGISTERS, 22));
-    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::FLOAT, ModbusRegion::HOLDING_REGISTERS, 26));
-    vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::FLOAT, ModbusRegion::HOLDING_REGISTERS, 28));
-    vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::DOUBLE, ModbusRegion::HOLDING_REGISTERS, 30));
-    vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::DOUBLE, ModbusRegion::HOLDING_REGISTERS, 34));
-    
-    vect.push_back(ModbusSignal(ModbusDataType::BOOL, ModbusRegion::INPUTS, 0));
-    vect.push_back(ModbusSignal(ModbusDataType::BOOL, ModbusRegion::INPUTS, 1));
-    vect.push_back(ModbusSignal(ModbusDataType::BOOL, ModbusRegion::INPUTS, 2));
-    vect.push_back(ModbusSignal(ModbusDataType::BOOL, ModbusRegion::INPUTS, 3));
-    vect.push_back(ModbusSignal(ModbusDataType::BOOL, ModbusRegion::INPUTS, 4));
+        vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::UINT_16, ModbusRegion::HOLDING_REGISTERS, 0));
+        vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::INT_16, ModbusRegion::HOLDING_REGISTERS, 1));
+        vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::UINT_32, ModbusRegion::HOLDING_REGISTERS, 2));
+        vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::UINT_32, ModbusRegion::HOLDING_REGISTERS, 4));
+        vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::INT_32, ModbusRegion::HOLDING_REGISTERS, 6));
+        vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::INT_32, ModbusRegion::HOLDING_REGISTERS, 8));
+        vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::UINT_64, ModbusRegion::HOLDING_REGISTERS, 10));
+        vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::UINT_64, ModbusRegion::HOLDING_REGISTERS, 14));
+        vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::INT_64, ModbusRegion::HOLDING_REGISTERS, 18));
+        vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::INT_64, ModbusRegion::HOLDING_REGISTERS, 22));
+        vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::FLOAT, ModbusRegion::HOLDING_REGISTERS, 26));
+        vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::FLOAT, ModbusRegion::HOLDING_REGISTERS, 28));
+        vect.push_back(ModbusSignal(Endian::BIG, ModbusDataType::DOUBLE, ModbusRegion::HOLDING_REGISTERS, 30));
+        vect.push_back(ModbusSignal(Endian::LITTLE, ModbusDataType::DOUBLE, ModbusRegion::HOLDING_REGISTERS, 34));
+        
+        vect.push_back(ModbusSignal(ModbusDataType::BOOL, ModbusRegion::INPUTS, 0));
+        vect.push_back(ModbusSignal(ModbusDataType::BOOL, ModbusRegion::INPUTS, 1));
+        vect.push_back(ModbusSignal(ModbusDataType::BOOL, ModbusRegion::INPUTS, 2));
+        vect.push_back(ModbusSignal(ModbusDataType::BOOL, ModbusRegion::INPUTS, 3));
+        vect.push_back(ModbusSignal(ModbusDataType::BOOL, ModbusRegion::INPUTS, 4));
 
-    vect.push_back(ModbusSignal(ModbusDataType::BOOL, ModbusRegion::COILS, 0));
-    vect.push_back(ModbusSignal(ModbusDataType::BOOL, ModbusRegion::COILS, 1));
-    vect.push_back(ModbusSignal(ModbusDataType::BOOL, ModbusRegion::COILS, 2));
-    vect.push_back(ModbusSignal(ModbusDataType::BOOL, ModbusRegion::COILS, 3));
-    vect.push_back(ModbusSignal(ModbusDataType::BOOL, ModbusRegion::COILS, 4));
+        vect.push_back(ModbusSignal(ModbusDataType::BOOL, ModbusRegion::COILS, 0));
+        vect.push_back(ModbusSignal(ModbusDataType::BOOL, ModbusRegion::COILS, 1));
+        vect.push_back(ModbusSignal(ModbusDataType::BOOL, ModbusRegion::COILS, 2));
+        vect.push_back(ModbusSignal(ModbusDataType::BOOL, ModbusRegion::COILS, 3));
+        vect.push_back(ModbusSignal(ModbusDataType::BOOL, ModbusRegion::COILS, 4));
+    }
 
     ModbusServer mb_srv;
-    mb_srv.SetConnectionParams("127.0.0.1", 502);
+    mb_srv.SetConnectionParams("127.0.0.1", 1502);
     mb_srv.SetSignalsDefinitions(vect);
     mb_srv.RunServer();
-    std::this_thread::sleep_for(std::chrono::seconds(20));
+
+    for (uint16_t i = 0; i < 20; i++)
+    {
+        std::vector<ModbusValue> newValues;
+        std::vector<int> signals;
+        ModbusValue val;
+        int cntr = 0;
+
+        val.UINT_16 = i;
+        signals.push_back(cntr++);
+        newValues.push_back(val);
+
+        val.UINT_16 = i;
+        signals.push_back(cntr++);
+        newValues.push_back(val);
+
+        val.UINT_32 = (uint32_t)i;
+        signals.push_back(cntr++);
+        newValues.push_back(val);
+
+        val.UINT_32 = (uint32_t)i;
+        signals.push_back(cntr++);
+        newValues.push_back(val);
+
+        val.INT_32 = (int32_t)i;
+        signals.push_back(cntr++);
+        newValues.push_back(val);
+
+        val.INT_32 = (int32_t)i;
+        signals.push_back(cntr++);
+        newValues.push_back(val);
+
+        val.UINT_64 = (uint64_t)i;
+        signals.push_back(cntr++);
+        newValues.push_back(val);
+
+        val.UINT_64 = (uint64_t)i;
+        signals.push_back(cntr++);
+        newValues.push_back(val);
+
+        val.FLOAT = (float)i;
+        signals.push_back(cntr++);
+        newValues.push_back(val);
+
+        val.FLOAT = (float)i;
+        signals.push_back(cntr++);
+        newValues.push_back(val);
+
+        val.DOUBLE = (double)i;
+        signals.push_back(cntr++);
+        newValues.push_back(val);
+
+        val.DOUBLE = (double)i;
+        signals.push_back(cntr++);
+        newValues.push_back(val);
+
+        mb_srv.UpdateMultipleModbusSignals(signals, newValues);
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
     mb_srv.StopServer();
 
     // ModbusClient mb_cli;

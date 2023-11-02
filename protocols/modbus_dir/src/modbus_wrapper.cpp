@@ -54,7 +54,7 @@ void ModbusClient::RunClient()
     }
 
     work = true;
-    clientThread = std::thread(ClientFunction);
+    clientThread = std::thread(&ModbusClient::ClientFunction, &(*this));
 }
 
 
@@ -364,6 +364,8 @@ void ModbusServer::SetModbusMapping()
         modbus_free(mb);
         returnedValue = -1;
     }
+
+    LOG_TRACE("Modbus server mapping set.");
 }
 
 
@@ -434,6 +436,7 @@ void ModbusServer::UpdateAllModbusSignals(std::vector<ModbusValue> newValues)
 
 void ModbusServer::InternalUpdater()
 {
+    LOG_TRACE("Updating Modbus server data");
     std::scoped_lock lock(mtx);
     for (auto& signal : modbusSignals)
     {
@@ -484,56 +487,88 @@ void ModbusServer::RunServer()
         return;
     }
 
+    LOG_TRACE("Starting Modbus server.");
     work = true;
-    serverThread = std::thread(ServerFunction);
+    serverThread = std::thread(&ModbusServer::ServerFunction, this);
 }
 
 
-// TODO convert to my approach
 void ModbusServer::ServerFunction()
 {
-    headerLength = modbus_get_header_length(mb);
-    mb = modbus_new_tcp(ip.c_str(), port);
-    query = new u_int8_t[MODBUS_TCP_MAX_ADU_LENGTH];
-    SetModbusMapping();
-
-    int s = modbus_tcp_listen(mb, 1);
-    modbus_tcp_accept(mb, &s);
-
-    while (work) 
+    while (work)
     {
+        mb = modbus_new_tcp(NULL, port);
+        if (mb == nullptr)
+        {
+            LOG_ERROR("Unable to start Modbus server at: {}:{}", ip, port);
+            work = false;
+            return;
+        }
+        
+        headerLength = modbus_get_header_length(mb);
+        SetModbusMapping();
+
+        LOG_TRACE("Modbus server is listening on {}:{}", ip, port);
+    
+        int s = modbus_tcp_listen(mb, 1);
+        if (s == -1)
+        {
+            LOG_TRACE("modbus_tcp_listen error. {}.", modbus_strerror(errno));
+            modbus_free(mb);
+            continue;
+        }
+        LOG_TRACE("s = {}", s);
+
+        int ret = modbus_tcp_accept(mb, &s);
+        if (ret == -1)
+        {
+            LOG_TRACE("modbus_tcp_accept erorr. {}.", modbus_strerror(errno));
+            modbus_free(mb);
+            close(s);   
+            continue;
+        }
+        LOG_TRACE("Connection accepted on socket: {}.", s);
+
         int rc;
-        do 
+        // query = new uint8_t[MODBUS_TCP_MAX_ADU_LENGTH];
+        uint8_t query[MODBUS_TCP_MAX_ADU_LENGTH];
+        while (work)
         {
-            if (needToUpdate)
+            do 
             {
-                InternalUpdater();
+                if (needToUpdate)
+                {
+                    InternalUpdater();
+                }
+                rc = modbus_receive(mb, query);
+            } 
+            while (rc == 0 && work);
+
+            // The connection is not closed on errors which require on reply such as bad CRC in RTU
+            if (rc == -1 && errno != EMBBADCRC) 
+            {
+                break;
             }
-            rc = modbus_receive(mb, query);
-        } 
-        while (rc == 0);
 
-        // The connection is not closed on errors which require on reply such as bad CRC in RTU
-        if (rc == -1 && errno != EMBBADCRC) 
-        {
-            break;
+            returnedValue = modbus_reply(mb, query, rc, mb_mapping);
+            if (rc == -1) 
+            {
+                break;
+            }
         }
-
-        returnedValue = modbus_reply(mb, query, rc, mb_mapping);
-        if (rc == -1) {
-            break;
-        }
+        close(s); 
+        modbus_mapping_free(mb_mapping);
+        modbus_close(mb);
+        modbus_free(mb);
     }
-
-    modbus_mapping_free(mb_mapping);
-    delete[] query;
-    modbus_close(mb);
-    modbus_free(mb);
+    
+    LOG_TRACE("Modbus server stopped running.");
 }
 
 
 void ModbusServer::StopServer()
 {
+    LOG_TRACE("Stopping Modbus server.");
     work = false;
     serverThread.join();
 }

@@ -72,13 +72,13 @@ private:
     modbus_t* mb;
     modbus_mapping_t* mb_mapping;
     std::string ip;
-    uint8_t *query;
+    // uint8_t *query;
     int headerLength;
     int port;
     int returnedValue;
     bool keepWorking;
     std::vector<ModbusSignal> modbusSignals;
-    std::atomic_bool needToUpdate{ 0 };
+    std::atomic_bool needToUpdate{ false };
     std::atomic_bool work;
     std::thread serverThread;
 
