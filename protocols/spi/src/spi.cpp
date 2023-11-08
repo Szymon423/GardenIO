@@ -30,12 +30,14 @@ void DataTransferSPI::ReadingFunction()
 		keep_running = false;
 		return
 	}
+	LOG_TRACE("{} started SPI communication.", class_name);
 	
 	while (keep_running && recieved_value)
 	{
 		std::unique_lock lock(mtx);
 		mySPI->xfer(tx_buffer, strlen((char*)tx_buffer), rx_buffer, strlen((char*)tx_buffer));
 		lock.unlock();
+
 		std::this_thread::sleep_for(std::chrono::milliseconds(cycle_period));
 	}
 	// mySPI->end();
